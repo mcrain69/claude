@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AgencyZoom Sales Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --az-blue: #1a3a5c;
+      --az-teal: #0097b2;
+      --az-green: #27ae60;
+      --az-orange: #e67e22;
+      --az-red: #e74c3c;
+      --az-purple: #8e44ad;
+      --bg: #f0f4f8;
+      --card: #ffffff;
+      --border: #dde3ea;
+      --text: #1e293b;
+      --muted: #64748b;
+      --radius: 12px;
+      --shadow: 0 2px 12px rgba(0,0,0,.08);
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ── Header ─────────────────────────────────── */
+    header {
+      background: var(--az-blue);
+      color: #fff;
+      padding: 0 24px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 8px rgba(0,0,0,.3);
+    }
+    .header-left { display: flex; align-items: center; gap: 14px; }
+    .logo {
+      width: 38px; height: 38px; border-radius: 8px;
+      background: var(--az-teal);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 18px; color: #fff; letter-spacing: -1px;
+    }
+    header h1 { font-size: 18px; font-weight: 700; letter-spacing: .3px; }
+    header h1 span { color: #7ecfe0; font-weight: 400; font-size: 14px; margin-left: 6px; }
+    .header-right { display: flex; align-items: center; gap: 16px; }
+    .period-badge {
+      background: rgba(255,255,255,.12);
+      border: 1px solid rgba(255,255,255,.2);
+      color: #e0f4f8;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: background .2s;
+    }
+    .period-badge:hover { background: rgba(255,255,255,.22); }
+    .avatar {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: var(--az-teal);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 14px; color: #fff;
+    }
+
+    /* ── Layout ──────────────────────────────────── */
+    main { padding: 24px; max-width: 1400px; margin: 0 auto; }
+
+    .section-title {
+      font-size: 13px; font-weight: 600; text-transform: uppercase;
+      letter-spacing: .8px; color: var(--muted); margin-bottom: 12px;
+    }
+
+    /* ── KPI Cards ───────────────────────────────── */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+    .kpi-card {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+    }
+    .kpi-card::after {
+      content: '';
+      position: absolute; top: 0; left: 0;
+      width: 4px; height: 100%;
+    }
+    .kpi-card.blue::after   { background: var(--az-teal); }
+    .kpi-card.green::after  { background: var(--az-green); }
+    .kpi-card.orange::after { background: var(--az-orange); }
+    .kpi-card.red::after    { background: var(--az-red); }
+    .kpi-card.purple::after { background: var(--az-purple); }
+    .kpi-card.navy::after   { background: var(--az-blue); }
+
+    .kpi-label { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .6px; color: var(--muted); }
+    .kpi-value { font-size: 28px; font-weight: 800; margin: 6px 0 4px; color: var(--text); }
+    .kpi-sub   { font-size: 12px; color: var(--muted); }
+    .kpi-delta {
+      display: inline-flex; align-items: center; gap: 3px;
+      font-size: 12px; font-weight: 600;
+      padding: 2px 8px; border-radius: 12px; margin-left: 6px;
+    }
+    .up   { background: #dcfce7; color: #16a34a; }
+    .down { background: #fee2e2; color: #dc2626; }
+
+    /* ── Two-column section ──────────────────────── */
+    .two-col { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 28px; }
+    .three-col { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 28px; }
+
+    @media (max-width: 1100px) { .two-col   { grid-template-columns: 1fr; } }
+    @media (max-width: 900px)  { .three-col { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 600px)  { .three-col { grid-template-columns: 1fr; } .kpi-value { font-size: 22px; } }
+
+    /* ── Chart Cards ─────────────────────────────── */
+    .card {
+      background: var(--card);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .card-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .card-header h3 { font-size: 15px; font-weight: 700; color: var(--text); }
+    .card-body { padding: 20px; }
+    .chart-wrap { position: relative; }
+
+    /* ── Tabs ────────────────────────────────────── */
+    .tabs { display: flex; gap: 2px; }
+    .tab {
+      padding: 5px 12px; border-radius: 6px; font-size: 12px; font-weight: 600;
+      border: none; background: transparent; color: var(--muted); cursor: pointer;
+      transition: all .15s;
+    }
+    .tab.active { background: var(--az-teal); color: #fff; }
+    .tab:hover:not(.active) { background: #f1f5f9; color: var(--text); }
+
+    /* ── Producer Table ──────────────────────────── */
+    .producer-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .producer-table th {
+      text-align: left; padding: 8px 12px;
+      font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px;
+      color: var(--muted); border-bottom: 1px solid var(--border);
+    }
+    .producer-table td { padding: 10px 12px; border-bottom: 1px solid #f1f5f9; }
+    .producer-table tr:last-child td { border-bottom: none; }
+    .producer-table tr:hover td { background: #f8fafc; }
+    .rank-badge {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 22px; height: 22px; border-radius: 50%;
+      font-size: 11px; font-weight: 800;
+    }
+    .rank-1 { background: #fef3c7; color: #d97706; }
+    .rank-2 { background: #f1f5f9; color: #64748b; }
+    .rank-3 { background: #fff7ed; color: #c2410c; }
+    .rank-n { background: #f1f5f9; color: #94a3b8; }
+    .bar-mini { background: #f1f5f9; border-radius: 99px; height: 6px; margin-top: 4px; overflow: hidden; }
+    .bar-fill  { height: 100%; border-radius: 99px; background: var(--az-teal); }
+    .status-dot {
+      display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 5px;
+    }
+    .dot-green  { background: var(--az-green); }
+    .dot-orange { background: var(--az-orange); }
+    .dot-red    { background: var(--az-red); }
+
+    /* ── Activity Feed ───────────────────────────── */
+    .activity-list { display: flex; flex-direction: column; gap: 0; }
+    .activity-item {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 12px 0; border-bottom: 1px solid #f1f5f9;
+    }
+    .activity-item:last-child { border-bottom: none; }
+    .act-icon {
+      width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center; font-size: 15px;
+    }
+    .act-green  { background: #dcfce7; }
+    .act-blue   { background: #dbeafe; }
+    .act-orange { background: #ffedd5; }
+    .act-red    { background: #fee2e2; }
+    .act-purple { background: #f3e8ff; }
+    .act-body { flex: 1; min-width: 0; }
+    .act-text { font-size: 13px; color: var(--text); line-height: 1.4; }
+    .act-text strong { font-weight: 600; }
+    .act-time { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+    /* ── Pipeline Funnel ─────────────────────────── */
+    .pipeline-row { margin-bottom: 14px; }
+    .pipeline-label {
+      display: flex; justify-content: space-between;
+      font-size: 13px; color: var(--text); margin-bottom: 5px;
+    }
+    .pipeline-label span:last-child { font-weight: 700; color: var(--az-teal); }
+    .pipeline-bar { height: 10px; background: #f1f5f9; border-radius: 99px; overflow: hidden; }
+    .pipeline-fill { height: 100%; border-radius: 99px; transition: width .6s ease; }
+
+    /* ── Goal Progress ───────────────────────────── */
+    .goal-card { padding: 16px 0; border-bottom: 1px solid #f1f5f9; }
+    .goal-card:last-child { border-bottom: none; }
+    .goal-header { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 6px; }
+    .goal-pct { font-weight: 700; color: var(--az-blue); }
+    .goal-bar { height: 8px; background: #f1f5f9; border-radius: 99px; overflow: hidden; }
+    .goal-fill { height: 100%; border-radius: 99px; }
+
+    /* ── Utility ─────────────────────────────────── */
+    .text-green  { color: var(--az-green); }
+    .text-red    { color: var(--az-red); }
+    .text-muted  { color: var(--muted); }
+    .font-bold   { font-weight: 700; }
+    .text-right  { text-align: right; }
+    .badge {
+      display: inline-block; padding: 2px 8px; border-radius: 10px;
+      font-size: 11px; font-weight: 600;
+    }
+    .badge-green  { background: #dcfce7; color: #16a34a; }
+    .badge-orange { background: #ffedd5; color: #c2410c; }
+    .badge-blue   { background: #dbeafe; color: #1d4ed8; }
+    .badge-gray   { background: #f1f5f9; color: #64748b; }
+    .last-updated { font-size: 11px; color: var(--muted); }
+  </style>
+</head>
+<body>
+
+<!-- ══ Header ══════════════════════════════════════ -->
+<header>
+  <div class="header-left">
+    <div class="logo">AZ</div>
+    <h1>AgencyZoom <span>Sales Dashboard</span></h1>
+  </div>
+  <div class="header-right">
+    <span class="period-badge">📅 YTD 2026</span>
+    <div class="avatar">JD</div>
+  </div>
+</header>
+
+<!-- ══ Main ════════════════════════════════════════ -->
+<main>
+
+  <!-- KPI Row -->
+  <p class="section-title">Key Performance Indicators</p>
+  <div class="kpi-grid">
+    <div class="kpi-card blue">
+      <div class="kpi-label">Total Premium Written</div>
+      <div class="kpi-value">$4.82M</div>
+      <div class="kpi-sub">YTD 2026 <span class="kpi-delta up">▲ 12.4%</span></div>
+    </div>
+    <div class="kpi-card green">
+      <div class="kpi-label">Policies Issued</div>
+      <div class="kpi-value">1,347</div>
+      <div class="kpi-sub">YTD 2026 <span class="kpi-delta up">▲ 8.1%</span></div>
+    </div>
+    <div class="kpi-card orange">
+      <div class="kpi-label">New Business</div>
+      <div class="kpi-value">$1.93M</div>
+      <div class="kpi-sub">Premium <span class="kpi-delta up">▲ 17.6%</span></div>
+    </div>
+    <div class="kpi-card navy">
+      <div class="kpi-label">Renewals</div>
+      <div class="kpi-value">$2.89M</div>
+      <div class="kpi-sub">Premium <span class="kpi-delta up">▲ 9.2%</span></div>
+    </div>
+    <div class="kpi-card purple">
+      <div class="kpi-label">Leads This Month</div>
+      <div class="kpi-value">382</div>
+      <div class="kpi-sub">Feb 2026 <span class="kpi-delta down">▼ 3.1%</span></div>
+    </div>
+    <div class="kpi-card red">
+      <div class="kpi-label">Close Rate</div>
+      <div class="kpi-value">34.7%</div>
+      <div class="kpi-sub">30-day avg <span class="kpi-delta up">▲ 2.3 pp</span></div>
+    </div>
+  </div>
+
+  <!-- Premium Trend + Policy Mix -->
+  <div class="two-col">
+    <!-- Monthly Premium Trend -->
+    <div class="card">
+      <div class="card-header">
+        <h3>Monthly Premium Trend</h3>
+        <div class="tabs">
+          <button class="tab active" onclick="switchTrend(this,'premium')">Premium</button>
+          <button class="tab" onclick="switchTrend(this,'policies')">Policies</button>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="chart-wrap" style="height:260px">
+          <canvas id="trendChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Policy Mix -->
+    <div class="card">
+      <div class="card-header">
+        <h3>Policy Mix (YTD)</h3>
+        <span class="last-updated">1,347 policies</span>
+      </div>
+      <div class="card-body">
+        <div class="chart-wrap" style="height:200px">
+          <canvas id="mixChart"></canvas>
+        </div>
+        <div style="margin-top:16px; display:flex; flex-direction:column; gap:8px;">
+          <div style="display:flex;justify-content:space-between;font-size:13px;">
+            <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#0097b2;margin-right:6px;"></span>Auto</span>
+            <span class="font-bold">512 <span class="text-muted">(38%)</span></span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;">
+            <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#1a3a5c;margin-right:6px;"></span>Home</span>
+            <span class="font-bold">337 <span class="text-muted">(25%)</span></span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;">
+            <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#27ae60;margin-right:6px;"></span>Life</span>
+            <span class="font-bold">229 <span class="text-muted">(17%)</span></span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;">
+            <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#e67e22;margin-right:6px;"></span>Commercial</span>
+            <span class="font-bold">189 <span class="text-muted">(14%)</span></span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;">
+            <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#8e44ad;margin-right:6px;"></span>Other</span>
+            <span class="font-bold">80 <span class="text-muted">(6%)</span></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Top Producers + Activity Feed -->
+  <div class="two-col">
+    <!-- Top Producers -->
+    <div class="card">
+      <div class="card-header">
+        <h3>Top Producers</h3>
+        <div class="tabs">
+          <button class="tab active" onclick="switchProducer(this,'premium')">By Premium</button>
+          <button class="tab" onclick="switchProducer(this,'policies')">By Policies</button>
+        </div>
+      </div>
+      <div class="card-body" style="padding:0 0 8px 0;">
+        <table class="producer-table">
+          <thead>
+            <tr>
+              <th style="width:36px">#</th>
+              <th>Producer</th>
+              <th class="text-right">Premium</th>
+              <th class="text-right">Policies</th>
+              <th class="text-right">Close %</th>
+            </tr>
+          </thead>
+          <tbody id="producerBody">
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="card">
+      <div class="card-header">
+        <h3>Recent Activity</h3>
+        <span class="last-updated">Live feed</span>
+      </div>
+      <div class="card-body" style="padding: 0 20px;">
+        <div class="activity-list">
+          <div class="activity-item">
+            <div class="act-icon act-green">✅</div>
+            <div class="act-body">
+              <div class="act-text"><strong>Policy Bound</strong> – Auto (GEICO) for Marcus Webb</div>
+              <div class="act-time">2 min ago · Sarah K. · $1,240/yr</div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="act-icon act-blue">📋</div>
+            <div class="act-body">
+              <div class="act-text"><strong>New Lead</strong> – Home insurance inquiry from Lisa Nguyen</div>
+              <div class="act-time">14 min ago · Web form · Dallas, TX</div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="act-icon act-green">✅</div>
+            <div class="act-body">
+              <div class="act-text"><strong>Renewal Confirmed</strong> – Commercial BOP for Apex Plumbing LLC</div>
+              <div class="act-time">31 min ago · Tom R. · $8,450/yr</div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="act-icon act-orange">⏳</div>
+            <div class="act-body">
+              <div class="act-text"><strong>Quote Sent</strong> – Life (Term 20) to David & Amy Chen</div>
+              <div class="act-time">47 min ago · Rachel M. · $520/yr est.</div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="act-icon act-red">❌</div>
+            <div class="act-body">
+              <div class="act-text"><strong>Lost Deal</strong> – Auto policy — went with competitor</div>
+              <div class="act-time">1 hr ago · James P. · $980/yr</div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="act-icon act-blue">📋</div>
+            <div class="act-body">
+              <div class="act-text"><strong>New Lead</strong> – Auto + Home bundle, referred by John Davis</div>
+              <div class="act-time">2 hr ago · Referral · Austin, TX</div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="act-icon act-green">✅</div>
+            <div class="act-body">
+              <div class="act-text"><strong>Policy Bound</strong> – Home (Travelers) for Patel Family</div>
+              <div class="act-time">3 hr ago · Sarah K. · $2,100/yr</div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="act-icon act-purple">🔄</div>
+            <div class="act-body">
+              <div class="act-text"><strong>Policy Endorsed</strong> – Added vehicle to existing auto policy</div>
+              <div class="act-time">4 hr ago · Tom R. · +$340/yr</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sales by Producer Chart + Pipeline + Goals -->
+  <div class="three-col">
+    <!-- Bar chart -->
+    <div class="card">
+      <div class="card-header">
+        <h3>Sales by Producer (Feb)</h3>
+      </div>
+      <div class="card-body">
+        <div class="chart-wrap" style="height:220px">
+          <canvas id="producerChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lead Pipeline -->
+    <div class="card">
+      <div class="card-header">
+        <h3>Lead Pipeline</h3>
+        <span class="last-updated">382 leads</span>
+      </div>
+      <div class="card-body">
+        <div class="pipeline-row">
+          <div class="pipeline-label"><span>🔵 New Leads</span><span>382</span></div>
+          <div class="pipeline-bar"><div class="pipeline-fill" style="width:100%;background:#0097b2;"></div></div>
+        </div>
+        <div class="pipeline-row">
+          <div class="pipeline-label"><span>🟡 Contacted</span><span>274</span></div>
+          <div class="pipeline-bar"><div class="pipeline-fill" style="width:71.7%;background:#f59e0b;"></div></div>
+        </div>
+        <div class="pipeline-row">
+          <div class="pipeline-label"><span>🟠 Quoted</span><span>193</span></div>
+          <div class="pipeline-bar"><div class="pipeline-fill" style="width:50.5%;background:#e67e22;"></div></div>
+        </div>
+        <div class="pipeline-row">
+          <div class="pipeline-label"><span>🟢 Proposal</span><span>141</span></div>
+          <div class="pipeline-bar"><div class="pipeline-fill" style="width:36.9%;background:#27ae60;"></div></div>
+        </div>
+        <div class="pipeline-row">
+          <div class="pipeline-label"><span>✅ Closed Won</span><span>133</span></div>
+          <div class="pipeline-bar"><div class="pipeline-fill" style="width:34.8%;background:#1a3a5c;"></div></div>
+        </div>
+        <div class="pipeline-row">
+          <div class="pipeline-label"><span>❌ Lost</span><span>60</span></div>
+          <div class="pipeline-bar"><div class="pipeline-fill" style="width:15.7%;background:#e74c3c;"></div></div>
+        </div>
+        <div style="margin-top:16px;padding-top:12px;border-top:1px solid var(--border);font-size:13px;display:flex;justify-content:space-between;">
+          <span class="text-muted">Conversion rate</span>
+          <span class="font-bold text-green">34.8%</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Monthly Goals -->
+    <div class="card">
+      <div class="card-header">
+        <h3>Monthly Goals (Feb 2026)</h3>
+        <span class="last-updated">19 days in</span>
+      </div>
+      <div class="card-body" style="padding: 0 20px 16px;">
+        <div class="goal-card">
+          <div class="goal-header">
+            <span>Premium Written</span>
+            <span class="goal-pct">78%</span>
+          </div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:6px;">$390K of $500K target</div>
+          <div class="goal-bar"><div class="goal-fill" style="width:78%;background:var(--az-teal);"></div></div>
+        </div>
+        <div class="goal-card">
+          <div class="goal-header">
+            <span>New Policies</span>
+            <span class="goal-pct">65%</span>
+          </div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:6px;">130 of 200 target</div>
+          <div class="goal-bar"><div class="goal-fill" style="width:65%;background:var(--az-green);"></div></div>
+        </div>
+        <div class="goal-card">
+          <div class="goal-header">
+            <span>Leads Generated</span>
+            <span class="goal-pct">91%</span>
+          </div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:6px;">382 of 420 target</div>
+          <div class="goal-bar"><div class="goal-fill" style="width:91%;background:var(--az-orange);"></div></div>
+        </div>
+        <div class="goal-card">
+          <div class="goal-header">
+            <span>Renewals Retained</span>
+            <span class="goal-pct">88%</span>
+          </div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:6px;">264 of 300 target</div>
+          <div class="goal-bar"><div class="goal-fill" style="width:88%;background:var(--az-purple);"></div></div>
+        </div>
+        <div class="goal-card">
+          <div class="goal-header">
+            <span>Cross-Sell Rate</span>
+            <span class="goal-pct">54%</span>
+          </div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:6px;">22% achieved, 40% target</div>
+          <div class="goal-bar"><div class="goal-fill" style="width:54%;background:var(--az-red);"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Source + Renewal Risk -->
+  <div class="two-col" style="margin-bottom:0;">
+    <!-- Lead Source Chart -->
+    <div class="card">
+      <div class="card-header">
+        <h3>Lead Sources (YTD)</h3>
+      </div>
+      <div class="card-body">
+        <div class="chart-wrap" style="height:220px;">
+          <canvas id="sourceChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Renewal Risk -->
+    <div class="card">
+      <div class="card-header">
+        <h3>Upcoming Renewals at Risk</h3>
+        <span class="badge badge-orange">28 at risk</span>
+      </div>
+      <div class="card-body" style="padding:0 20px 12px;">
+        <table class="producer-table">
+          <thead>
+            <tr>
+              <th>Insured</th>
+              <th>Line</th>
+              <th class="text-right">Premium</th>
+              <th class="text-right">Risk</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><div style="font-size:13px;">Apex Plumbing LLC</div><div style="font-size:11px;color:var(--muted);">Renews Mar 1</div></td>
+              <td><span class="badge badge-orange">Comm.</span></td>
+              <td class="text-right font-bold">$8,450</td>
+              <td class="text-right"><span class="badge badge-orange">High</span></td>
+            </tr>
+            <tr>
+              <td><div style="font-size:13px;">Rivera Family</div><div style="font-size:11px;color:var(--muted);">Renews Mar 4</div></td>
+              <td><span class="badge badge-blue">Auto</span></td>
+              <td class="text-right font-bold">$2,210</td>
+              <td class="text-right"><span class="badge badge-orange">High</span></td>
+            </tr>
+            <tr>
+              <td><div style="font-size:13px;">Greenway Florist</div><div style="font-size:11px;color:var(--muted);">Renews Mar 8</div></td>
+              <td><span class="badge badge-orange">Comm.</span></td>
+              <td class="text-right font-bold">$4,800</td>
+              <td class="text-right"><span class="badge badge-gray">Med</span></td>
+            </tr>
+            <tr>
+              <td><div style="font-size:13px;">Thompson, K.</div><div style="font-size:11px;color:var(--muted);">Renews Mar 12</div></td>
+              <td><span class="badge badge-blue">Home</span></td>
+              <td class="text-right font-bold">$1,900</td>
+              <td class="text-right"><span class="badge badge-gray">Med</span></td>
+            </tr>
+            <tr>
+              <td><div style="font-size:13px;">Liu & Associates</div><div style="font-size:11px;color:var(--muted);">Renews Mar 18</div></td>
+              <td><span class="badge badge-orange">Comm.</span></td>
+              <td class="text-right font-bold">$12,100</td>
+              <td class="text-right"><span class="badge badge-green">Low</span></td>
+            </tr>
+          </tbody>
+        </table>
+        <div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border);font-size:12px;color:var(--muted);text-align:right;">
+          Showing top 5 of 28 at-risk renewals this month
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+/* ─── Data ──────────────────────────────────────── */
+const months = ['Aug','Sep','Oct','Nov','Dec','Jan','Feb'];
+
+const premiumData = {
+  newBiz:  [180,210,195,240,185,220,390],
+  renewal: [420,460,480,510,395,490,390],
+};
+const policyData = {
+  newBiz:  [62, 74, 68, 83, 61, 78, 133],
+  renewal: [148,162,171,188,145,182,264],
+};
+
+const producers = [
+  { name:'Sarah Kim',    initials:'SK', premium:92400, policies:47, close:42 },
+  { name:'Tom Rivera',   initials:'TR', premium:87100, policies:43, close:38 },
+  { name:'Rachel Moore', initials:'RM', premium:71300, policies:36, close:35 },
+  { name:'James Park',   initials:'JP', premium:58600, policies:29, close:31 },
+  { name:'Dana Okafor',  initials:'DO', premium:44200, policies:22, close:29 },
+  { name:'Chris Yuen',   initials:'CY', premium:36500, policies:18, close:27 },
+];
+
+/* ─── Helpers ───────────────────────────────────── */
+const fmt = v => '$' + (v>=1e6 ? (v/1e6).toFixed(2)+'M' : v>=1e3 ? (v/1e3).toFixed(0)+'K' : v);
+const colors = {
+  teal:'#0097b2', navy:'#1a3a5c', green:'#27ae60',
+  orange:'#e67e22', red:'#e74c3c', purple:'#8e44ad',
+};
+const FONT = "'Segoe UI','Helvetica Neue',sans-serif";
+
+Chart.defaults.font.family = FONT;
+Chart.defaults.color = '#64748b';
+
+/* ─── Trend Chart ───────────────────────────────── */
+let trendMode = 'premium';
+const trendCtx = document.getElementById('trendChart').getContext('2d');
+const trendChart = new Chart(trendCtx, {
+  type: 'bar',
+  data: buildTrendData('premium'),
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend:{ position:'bottom', labels:{ boxWidth:12, padding:16 } }, tooltip:{ mode:'index', intersect:false } },
+    scales: {
+      x:{ stacked:true, grid:{ display:false } },
+      y:{ stacked:true, ticks:{ callback: v => '$'+(v/1e3)+'K' }, grid:{ color:'#f1f5f9' } }
+    }
+  }
+});
+
+function buildTrendData(mode) {
+  if (mode === 'premium') {
+    return {
+      labels: months,
+      datasets: [
+        { label:'New Business', data: premiumData.newBiz.map(v=>v*1000), backgroundColor: colors.teal, borderRadius:4 },
+        { label:'Renewals',     data: premiumData.renewal.map(v=>v*1000), backgroundColor: colors.navy, borderRadius:4 }
+      ]
+    };
+  } else {
+    return {
+      labels: months,
+      datasets: [
+        { label:'New Business', data: policyData.newBiz,  backgroundColor: colors.teal, borderRadius:4 },
+        { label:'Renewals',     data: policyData.renewal, backgroundColor: colors.navy, borderRadius:4 }
+      ]
+    };
+  }
+}
+
+function switchTrend(btn, mode) {
+  document.querySelectorAll('#trendChart').forEach(()=>{});
+  btn.closest('.tabs').querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  trendMode = mode;
+  trendChart.data = buildTrendData(mode);
+  trendChart.options.scales.y.ticks.callback = mode==='premium' ? v=>'$'+(v/1e3)+'K' : v=>v;
+  trendChart.update();
+}
+
+/* ─── Policy Mix Donut ──────────────────────────── */
+new Chart(document.getElementById('mixChart').getContext('2d'), {
+  type: 'doughnut',
+  data: {
+    labels:['Auto','Home','Life','Commercial','Other'],
+    datasets:[{ data:[512,337,229,189,80],
+      backgroundColor:[colors.teal,colors.navy,colors.green,colors.orange,colors.purple],
+      borderWidth:2, borderColor:'#fff', hoverOffset:6 }]
+  },
+  options: {
+    responsive:true, maintainAspectRatio:false, cutout:'68%',
+    plugins:{ legend:{ display:false }, tooltip:{ callbacks:{ label: ctx => ` ${ctx.label}: ${ctx.parsed}` } } }
+  }
+});
+
+/* ─── Producer Bar Chart ────────────────────────── */
+new Chart(document.getElementById('producerChart').getContext('2d'), {
+  type:'bar',
+  data:{
+    labels: producers.map(p=>p.name.split(' ')[0]),
+    datasets:[{ label:'Premium', data: producers.map(p=>p.premium),
+      backgroundColor:[colors.teal,colors.navy,colors.green,colors.orange,colors.purple,colors.red],
+      borderRadius:6 }]
+  },
+  options:{
+    responsive:true, maintainAspectRatio:false, indexAxis:'y',
+    plugins:{ legend:{ display:false }, tooltip:{ callbacks:{ label: ctx=>' '+fmt(ctx.parsed.x) } } },
+    scales:{
+      x:{ ticks:{ callback: v=>'$'+(v/1e3)+'K' }, grid:{ color:'#f1f5f9' } },
+      y:{ grid:{ display:false } }
+    }
+  }
+});
+
+/* ─── Lead Source Bar Chart ─────────────────────── */
+new Chart(document.getElementById('sourceChart').getContext('2d'), {
+  type:'bar',
+  data:{
+    labels:['Referral','Web Form','Social','Cold Call','Event','Partner','Walk-in'],
+    datasets:[
+      { label:'Closed',  data:[148,87,52,38,24,19,8], backgroundColor:colors.teal, borderRadius:4 },
+      { label:'Lost',    data:[42,68,41,55,18,12,6],  backgroundColor:'#e74c3c',   borderRadius:4 },
+      { label:'Pending', data:[28,45,33,28,14,8,4],   backgroundColor:'#f59e0b',   borderRadius:4 },
+    ]
+  },
+  options:{
+    responsive:true, maintainAspectRatio:false,
+    plugins:{ legend:{ position:'bottom', labels:{ boxWidth:12, padding:12 } }, tooltip:{ mode:'index', intersect:false } },
+    scales:{
+      x:{ stacked:true, grid:{ display:false } },
+      y:{ stacked:true, grid:{ color:'#f1f5f9' } }
+    }
+  }
+});
+
+/* ─── Producer Table ────────────────────────────── */
+let producerMode = 'premium';
+function renderProducerTable(mode) {
+  const sorted = [...producers].sort((a,b)=>b[mode]-a[mode]);
+  const max = sorted[0][mode];
+  const tbody = document.getElementById('producerBody');
+  tbody.innerHTML = sorted.map((p,i)=>{
+    const rankClass = ['rank-1','rank-2','rank-3','rank-n','rank-n','rank-n'][i];
+    const pct = Math.round((p[mode]/max)*100);
+    return `
+      <tr>
+        <td><span class="rank-badge ${rankClass}">${i+1}</span></td>
+        <td>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div style="width:28px;height:28px;border-radius:50%;background:${Object.values(colors)[i]};display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;">${p.initials}</div>
+            <div>
+              <div style="font-size:13px;font-weight:600;">${p.name}</div>
+              <div class="bar-mini" style="width:80px;"><div class="bar-fill" style="width:${pct}%;background:${Object.values(colors)[i]};"></div></div>
+            </div>
+          </div>
+        </td>
+        <td class="text-right font-bold">${fmt(p.premium)}</td>
+        <td class="text-right">${p.policies}</td>
+        <td class="text-right"><span class="${p.close>=35?'text-green':p.close>=30?'':'text-red'} font-bold">${p.close}%</span></td>
+      </tr>`;
+  }).join('');
+}
+
+function switchProducer(btn, mode) {
+  btn.closest('.tabs').querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  producerMode = mode;
+  renderProducerTable(mode);
+}
+
+renderProducerTable('premium');
+</script>
+</body>
+</html>
