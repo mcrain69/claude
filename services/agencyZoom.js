@@ -17,15 +17,12 @@ const API_KEY  = process.env.AZ_API_KEY;
 
 // Cache TTLs (seconds)
 const TTL = {
-  kpis:       300,   // 5 min
-  trend:      600,   // 10 min
-  producers:  300,
-  pipeline:   180,   // 3 min — leads change often
-  activity:    60,   // 1 min — near-real-time
-  policyMix:  600,
-  goals:      300,
-  sources:    600,
-  renewals:   300,
+  kpis:      300,   // 5 min
+  trend:     600,   // 10 min
+  producers: 300,
+  pipeline:  180,   // 3 min — leads change often
+  policyMix: 600,
+  goals:     300,
 };
 
 // ── Low-level request ─────────────────────────────────────────────────────────
@@ -180,25 +177,6 @@ async function getPipeline() {
 }
 
 /**
- * Recent activity events (last 20).
- * AgencyZoom endpoint: GET /activities
- */
-async function getActivity() {
-  return withCache('activity:recent', TTL.activity, async () => {
-    const data = await azFetch('/activities', { limit: 20, sort: 'occurred_at:desc' });
-
-    return (data.activities ?? []).map(a => ({
-      id:           a.id,
-      type:         a.type,        // policy_bound | lead_created | renewal_confirmed | quote_sent | policy_lost | endorsement
-      description:  a.description,
-      producerName: a.producer_name,
-      premium:      a.premium ?? null,
-      occurredAt:   a.occurred_at,
-    }));
-  });
-}
-
-/**
  * Policy count broken down by line of business (YTD).
  * AgencyZoom endpoint: GET /reports/policy-mix
  */
@@ -235,55 +213,11 @@ async function getGoals() {
   });
 }
 
-/**
- * Leads grouped by source YTD (Closed / Lost / Pending).
- * AgencyZoom endpoint: GET /reports/lead-sources
- */
-async function getLeadSources() {
-  return withCache('lead-sources:ytd', TTL.sources, async () => {
-    const { start_date, end_date } = ytdRange();
-    const data = await azFetch('/reports/lead-sources', { start_date, end_date });
-
-    // Expect: { sources: [{source, closed, lost, pending}] }
-    return (data.sources ?? []).map(s => ({
-      source:  s.source,
-      closed:  s.closed  ?? 0,
-      lost:    s.lost    ?? 0,
-      pending: s.pending ?? 0,
-    }));
-  });
-}
-
-/**
- * Policies renewing in the next 30 days, sorted by risk score.
- * AgencyZoom endpoint: GET /policies/renewals-at-risk
- */
-async function getRenewalsAtRisk() {
-  return withCache('renewals-at-risk:30d', TTL.renewals, async () => {
-    const data = await azFetch('/policies/renewals-at-risk', { days_ahead: 30 });
-
-    // Expect: { policies: [{id, insured_name, line_of_business, premium,
-    //                        renewal_date, risk_level, producer_name}] }
-    return (data.policies ?? []).map(p => ({
-      id:           p.id,
-      insuredName:  p.insured_name,
-      line:         p.line_of_business,
-      premium:      p.premium,
-      renewalDate:  p.renewal_date,
-      riskLevel:    p.risk_level,   // 'high' | 'medium' | 'low'
-      producerName: p.producer_name,
-    }));
-  });
-}
-
 module.exports = {
   getKPIs,
   getTrend,
   getProducers,
   getPipeline,
-  getActivity,
   getPolicyMix,
   getGoals,
-  getLeadSources,
-  getRenewalsAtRisk,
 };

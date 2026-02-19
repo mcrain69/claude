@@ -42,15 +42,6 @@ router.get('/pipeline', wrap(async (req, res) => {
 }));
 
 /**
- * GET /api/dashboard/activity
- * Recent activity feed (last 20 events)
- */
-router.get('/activity', wrap(async (req, res) => {
-  const data = await az.getActivity();
-  res.json(data);
-}));
-
-/**
  * GET /api/dashboard/policy-mix
  * Policy count by line of business (YTD)
  */
@@ -69,44 +60,22 @@ router.get('/goals', wrap(async (req, res) => {
 }));
 
 /**
- * GET /api/dashboard/lead-sources
- * Leads grouped by source (Closed / Lost / Pending) — YTD
- */
-router.get('/lead-sources', wrap(async (req, res) => {
-  const data = await az.getLeadSources();
-  res.json(data);
-}));
-
-/**
- * GET /api/dashboard/renewals-at-risk
- * Policies renewing in the next 30 days sorted by risk
- */
-router.get('/renewals-at-risk', wrap(async (req, res) => {
-  const data = await az.getRenewalsAtRisk();
-  res.json(data);
-}));
-
-/**
  * GET /api/dashboard/all
  * Fetch every section in parallel — used on initial page load
  */
 router.get('/all', wrap(async (req, res) => {
   const [
-    kpis, trend, producers, pipeline,
-    activity, policyMix, goals, leadSources, renewalsAtRisk,
+    kpis, trend, producers, pipeline, policyMix, goals,
   ] = await Promise.all([
     az.getKPIs(),
     az.getTrend(),
     az.getProducers(),
     az.getPipeline(),
-    az.getActivity(),
     az.getPolicyMix(),
     az.getGoals(),
-    az.getLeadSources(),
-    az.getRenewalsAtRisk(),
   ]);
 
-  res.json({ kpis, trend, producers, pipeline, activity, policyMix, goals, leadSources, renewalsAtRisk });
+  res.json({ kpis, trend, producers, pipeline, policyMix, goals });
 }));
 
 module.exports = router;

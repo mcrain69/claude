@@ -353,18 +353,6 @@
       </div>
     </div>
 
-    <!-- Recent Activity -->
-    <div class="card">
-      <div class="card-header">
-        <h3>Recent Activity</h3>
-        <span class="last-updated">Live feed</span>
-      </div>
-      <div class="card-body" style="padding: 0 20px;">
-        <div id="activityFeed" class="activity-list">
-          <div class="activity-item"><div class="act-body" style="color:var(--muted);font-size:13px;padding:12px 0;">Loading activity…</div></div>
-        </div>
-      </div>
-    </div>
   </div>
 
   <!-- Sales by Producer Chart + Pipeline + Goals -->
@@ -408,42 +396,6 @@
     </div>
   </div>
 
-  <!-- Source + Renewal Risk -->
-  <div class="two-col" style="margin-bottom:0;">
-    <!-- Lead Source Chart -->
-    <div class="card">
-      <div class="card-header">
-        <h3>Lead Sources (YTD)</h3>
-      </div>
-      <div class="card-body">
-        <div class="chart-wrap" style="height:220px;">
-          <canvas id="sourceChart"></canvas>
-        </div>
-      </div>
-    </div>
-
-    <!-- Renewal Risk -->
-    <div class="card">
-      <div class="card-header">
-        <h3>Upcoming Renewals at Risk</h3>
-        <span class="badge badge-orange">28 at risk</span>
-      </div>
-      <div class="card-body" style="padding:0 20px 12px;">
-        <table class="producer-table">
-          <thead>
-            <tr>
-              <th>Insured</th>
-              <th>Line</th>
-              <th class="text-right">Premium</th>
-              <th class="text-right">Risk</th>
-            </tr>
-          </thead>
-          <tbody id="renewalsBody"></tbody>
-        </table>
-        <div id="renewalsFooter" style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border);font-size:12px;color:var(--muted);text-align:right;"></div>
-      </div>
-    </div>
-  </div>
 
 </main>
 
@@ -464,26 +416,8 @@ const FONT = "'Segoe UI','Helvetica Neue',sans-serif";
 Chart.defaults.font.family = FONT;
 Chart.defaults.color = '#64748b';
 
-// Activity event type → icon + CSS class
-const ACT_ICON = {
-  policy_bound:         { icon:'✅', cls:'act-green'  },
-  lead_created:         { icon:'📋', cls:'act-blue'   },
-  renewal_confirmed:    { icon:'✅', cls:'act-green'  },
-  quote_sent:           { icon:'⏳', cls:'act-orange' },
-  policy_lost:          { icon:'❌', cls:'act-red'    },
-  endorsement:          { icon:'🔄', cls:'act-purple' },
-};
-
-function timeAgo(iso) {
-  const diff = Math.floor((Date.now() - new Date(iso)) / 1000);
-  if (diff < 60)   return `${diff}s ago`;
-  if (diff < 3600) return `${Math.floor(diff/60)} min ago`;
-  if (diff < 86400)return `${Math.floor(diff/3600)} hr ago`;
-  return new Date(iso).toLocaleDateString();
-}
-
 /* ─── Chart instances (module-level so switchTrend can update) ── */
-let trendChart, mixChart, producerBarChart, sourceChart;
+let trendChart, mixChart, producerBarChart;
 let trendData = {};   // cached from API
 let trendMode = 'premium';
 let allProducers = [];
@@ -605,28 +539,6 @@ function initProducerBarChart(producers) {
   });
 }
 
-/* ─── Lead Source Chart ─────────────────────────── */
-function initSourceChart(sources) {
-  sourceChart = new Chart(document.getElementById('sourceChart').getContext('2d'), {
-    type:'bar',
-    data:{
-      labels: sources.map(s=>s.source),
-      datasets:[
-        { label:'Closed',  data:sources.map(s=>s.closed),  backgroundColor:colors.teal,   borderRadius:4 },
-        { label:'Lost',    data:sources.map(s=>s.lost),    backgroundColor:colors.red,    borderRadius:4 },
-        { label:'Pending', data:sources.map(s=>s.pending), backgroundColor:'#f59e0b',     borderRadius:4 },
-      ]
-    },
-    options:{
-      responsive:true, maintainAspectRatio:false,
-      plugins:{ legend:{ position:'bottom', labels:{ boxWidth:12, padding:12 } }, tooltip:{ mode:'index', intersect:false } },
-      scales:{
-        x:{ stacked:true, grid:{ display:false } },
-        y:{ stacked:true, grid:{ color:'#f1f5f9' } }
-      }
-    }
-  });
-}
 
 /* ─── Producer Table ────────────────────────────── */
 function renderProducerTable(mode) {
@@ -702,44 +614,6 @@ function renderGoals(goals) {
     </div>`).join('');
 }
 
-/* ─── Activity Feed ─────────────────────────────── */
-function renderActivity(activities) {
-  const el = document.getElementById('activityFeed');
-  if (!el) return;
-  el.innerHTML = activities.map(a=>{
-    const { icon, cls } = ACT_ICON[a.type] ?? { icon:'📌', cls:'act-blue' };
-    const typeLabel = a.type.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
-    return `
-      <div class="activity-item">
-        <div class="act-icon ${cls}">${icon}</div>
-        <div class="act-body">
-          <div class="act-text"><strong>${typeLabel}</strong> – ${a.description}</div>
-          <div class="act-time">${timeAgo(a.occurredAt)}${a.producerName?' · '+a.producerName:''}${a.premium?' · '+fmt(a.premium)+'/yr':''}</div>
-        </div>
-      </div>`;
-  }).join('');
-}
-
-/* ─── Renewals at Risk ──────────────────────────── */
-function renderRenewals(renewals) {
-  const el = document.getElementById('renewalsBody');
-  if (!el) return;
-  const riskBadge = { high:'badge-orange', medium:'badge-gray', low:'badge-green' };
-  el.innerHTML = renewals.slice(0,5).map(r=>`
-    <tr>
-      <td>
-        <div style="font-size:13px;">${r.insuredName}</div>
-        <div style="font-size:11px;color:var(--muted);">Renews ${new Date(r.renewalDate).toLocaleDateString('en-US',{month:'short',day:'numeric'})}</div>
-      </td>
-      <td><span class="badge badge-blue">${r.line}</span></td>
-      <td class="text-right font-bold">${fmt(r.premium)}</td>
-      <td class="text-right"><span class="badge ${riskBadge[r.riskLevel]??'badge-gray'}">${r.riskLevel.charAt(0).toUpperCase()+r.riskLevel.slice(1)}</span></td>
-    </tr>`).join('');
-
-  const footer = document.getElementById('renewalsFooter');
-  if (footer) footer.textContent = `Showing top 5 of ${renewals.length} at-risk renewals this month`;
-}
-
 /* ─── Error / Loading states ────────────────────── */
 function showError(msg) {
   const el = document.getElementById('globalError');
@@ -761,12 +635,9 @@ async function loadDashboard() {
     initTrendChart();
     initMixChart(data.policyMix);
     initProducerBarChart(data.producers);
-    initSourceChart(data.leadSources);
     renderProducerTable('premium');
     renderPipeline(data.pipeline);
     renderGoals(data.goals);
-    renderActivity(data.activity);
-    renderRenewals(data.renewalsAtRisk);
   } catch (err) {
     showError('Could not load dashboard data: ' + err.message);
   }
