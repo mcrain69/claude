@@ -258,36 +258,37 @@
 
   <!-- KPI Row -->
   <p class="section-title">Key Performance Indicators</p>
+  <div id="globalError" style="display:none;background:#fee2e2;color:#991b1b;padding:10px 16px;border-radius:8px;margin-bottom:16px;font-size:13px;"></div>
   <div class="kpi-grid">
-    <div class="kpi-card blue">
+    <div id="kpi-total-prem" class="kpi-card blue">
       <div class="kpi-label">Total Premium Written</div>
-      <div class="kpi-value">$4.82M</div>
-      <div class="kpi-sub">YTD 2026 <span class="kpi-delta up">▲ 12.4%</span></div>
+      <div class="kpi-value">—</div>
+      <div class="kpi-sub">YTD 2026 <span class="kpi-delta-wrap"></span></div>
     </div>
-    <div class="kpi-card green">
+    <div id="kpi-total-pol" class="kpi-card green">
       <div class="kpi-label">Policies Issued</div>
-      <div class="kpi-value">1,347</div>
-      <div class="kpi-sub">YTD 2026 <span class="kpi-delta up">▲ 8.1%</span></div>
+      <div class="kpi-value">—</div>
+      <div class="kpi-sub">YTD 2026 <span class="kpi-delta-wrap"></span></div>
     </div>
-    <div class="kpi-card orange">
+    <div id="kpi-new-biz" class="kpi-card orange">
       <div class="kpi-label">New Business</div>
-      <div class="kpi-value">$1.93M</div>
-      <div class="kpi-sub">Premium <span class="kpi-delta up">▲ 17.6%</span></div>
+      <div class="kpi-value">—</div>
+      <div class="kpi-sub">Premium <span class="kpi-delta-wrap"></span></div>
     </div>
-    <div class="kpi-card navy">
+    <div id="kpi-renewals" class="kpi-card navy">
       <div class="kpi-label">Renewals</div>
-      <div class="kpi-value">$2.89M</div>
-      <div class="kpi-sub">Premium <span class="kpi-delta up">▲ 9.2%</span></div>
+      <div class="kpi-value">—</div>
+      <div class="kpi-sub">Premium <span class="kpi-delta-wrap"></span></div>
     </div>
-    <div class="kpi-card purple">
+    <div id="kpi-leads" class="kpi-card purple">
       <div class="kpi-label">Leads This Month</div>
-      <div class="kpi-value">382</div>
-      <div class="kpi-sub">Feb 2026 <span class="kpi-delta down">▼ 3.1%</span></div>
+      <div class="kpi-value">—</div>
+      <div class="kpi-sub">Current month <span class="kpi-delta-wrap"></span></div>
     </div>
-    <div class="kpi-card red">
+    <div id="kpi-close" class="kpi-card red">
       <div class="kpi-label">Close Rate</div>
-      <div class="kpi-value">34.7%</div>
-      <div class="kpi-sub">30-day avg <span class="kpi-delta up">▲ 2.3 pp</span></div>
+      <div class="kpi-value">—</div>
+      <div class="kpi-sub">30-day avg <span class="kpi-delta-wrap"></span></div>
     </div>
   </div>
 
@@ -313,34 +314,13 @@
     <div class="card">
       <div class="card-header">
         <h3>Policy Mix (YTD)</h3>
-        <span class="last-updated">1,347 policies</span>
+        <span id="mixPolicyCount" class="last-updated">— policies</span>
       </div>
       <div class="card-body">
         <div class="chart-wrap" style="height:200px">
           <canvas id="mixChart"></canvas>
         </div>
-        <div style="margin-top:16px; display:flex; flex-direction:column; gap:8px;">
-          <div style="display:flex;justify-content:space-between;font-size:13px;">
-            <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#0097b2;margin-right:6px;"></span>Auto</span>
-            <span class="font-bold">512 <span class="text-muted">(38%)</span></span>
-          </div>
-          <div style="display:flex;justify-content:space-between;font-size:13px;">
-            <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#1a3a5c;margin-right:6px;"></span>Home</span>
-            <span class="font-bold">337 <span class="text-muted">(25%)</span></span>
-          </div>
-          <div style="display:flex;justify-content:space-between;font-size:13px;">
-            <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#27ae60;margin-right:6px;"></span>Life</span>
-            <span class="font-bold">229 <span class="text-muted">(17%)</span></span>
-          </div>
-          <div style="display:flex;justify-content:space-between;font-size:13px;">
-            <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#e67e22;margin-right:6px;"></span>Commercial</span>
-            <span class="font-bold">189 <span class="text-muted">(14%)</span></span>
-          </div>
-          <div style="display:flex;justify-content:space-between;font-size:13px;">
-            <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#8e44ad;margin-right:6px;"></span>Other</span>
-            <span class="font-bold">80 <span class="text-muted">(6%)</span></span>
-          </div>
-        </div>
+        <div id="mixLegend" style="margin-top:16px;display:flex;flex-direction:column;gap:8px;"></div>
       </div>
     </div>
   </div>
@@ -380,63 +360,8 @@
         <span class="last-updated">Live feed</span>
       </div>
       <div class="card-body" style="padding: 0 20px;">
-        <div class="activity-list">
-          <div class="activity-item">
-            <div class="act-icon act-green">✅</div>
-            <div class="act-body">
-              <div class="act-text"><strong>Policy Bound</strong> – Auto (GEICO) for Marcus Webb</div>
-              <div class="act-time">2 min ago · Sarah K. · $1,240/yr</div>
-            </div>
-          </div>
-          <div class="activity-item">
-            <div class="act-icon act-blue">📋</div>
-            <div class="act-body">
-              <div class="act-text"><strong>New Lead</strong> – Home insurance inquiry from Lisa Nguyen</div>
-              <div class="act-time">14 min ago · Web form · Dallas, TX</div>
-            </div>
-          </div>
-          <div class="activity-item">
-            <div class="act-icon act-green">✅</div>
-            <div class="act-body">
-              <div class="act-text"><strong>Renewal Confirmed</strong> – Commercial BOP for Apex Plumbing LLC</div>
-              <div class="act-time">31 min ago · Tom R. · $8,450/yr</div>
-            </div>
-          </div>
-          <div class="activity-item">
-            <div class="act-icon act-orange">⏳</div>
-            <div class="act-body">
-              <div class="act-text"><strong>Quote Sent</strong> – Life (Term 20) to David & Amy Chen</div>
-              <div class="act-time">47 min ago · Rachel M. · $520/yr est.</div>
-            </div>
-          </div>
-          <div class="activity-item">
-            <div class="act-icon act-red">❌</div>
-            <div class="act-body">
-              <div class="act-text"><strong>Lost Deal</strong> – Auto policy — went with competitor</div>
-              <div class="act-time">1 hr ago · James P. · $980/yr</div>
-            </div>
-          </div>
-          <div class="activity-item">
-            <div class="act-icon act-blue">📋</div>
-            <div class="act-body">
-              <div class="act-text"><strong>New Lead</strong> – Auto + Home bundle, referred by John Davis</div>
-              <div class="act-time">2 hr ago · Referral · Austin, TX</div>
-            </div>
-          </div>
-          <div class="activity-item">
-            <div class="act-icon act-green">✅</div>
-            <div class="act-body">
-              <div class="act-text"><strong>Policy Bound</strong> – Home (Travelers) for Patel Family</div>
-              <div class="act-time">3 hr ago · Sarah K. · $2,100/yr</div>
-            </div>
-          </div>
-          <div class="activity-item">
-            <div class="act-icon act-purple">🔄</div>
-            <div class="act-body">
-              <div class="act-text"><strong>Policy Endorsed</strong> – Added vehicle to existing auto policy</div>
-              <div class="act-time">4 hr ago · Tom R. · +$340/yr</div>
-            </div>
-          </div>
+        <div id="activityFeed" class="activity-list">
+          <div class="activity-item"><div class="act-body" style="color:var(--muted);font-size:13px;padding:12px 0;">Loading activity…</div></div>
         </div>
       </div>
     </div>
@@ -463,33 +388,10 @@
         <span class="last-updated">382 leads</span>
       </div>
       <div class="card-body">
-        <div class="pipeline-row">
-          <div class="pipeline-label"><span>🔵 New Leads</span><span>382</span></div>
-          <div class="pipeline-bar"><div class="pipeline-fill" style="width:100%;background:#0097b2;"></div></div>
-        </div>
-        <div class="pipeline-row">
-          <div class="pipeline-label"><span>🟡 Contacted</span><span>274</span></div>
-          <div class="pipeline-bar"><div class="pipeline-fill" style="width:71.7%;background:#f59e0b;"></div></div>
-        </div>
-        <div class="pipeline-row">
-          <div class="pipeline-label"><span>🟠 Quoted</span><span>193</span></div>
-          <div class="pipeline-bar"><div class="pipeline-fill" style="width:50.5%;background:#e67e22;"></div></div>
-        </div>
-        <div class="pipeline-row">
-          <div class="pipeline-label"><span>🟢 Proposal</span><span>141</span></div>
-          <div class="pipeline-bar"><div class="pipeline-fill" style="width:36.9%;background:#27ae60;"></div></div>
-        </div>
-        <div class="pipeline-row">
-          <div class="pipeline-label"><span>✅ Closed Won</span><span>133</span></div>
-          <div class="pipeline-bar"><div class="pipeline-fill" style="width:34.8%;background:#1a3a5c;"></div></div>
-        </div>
-        <div class="pipeline-row">
-          <div class="pipeline-label"><span>❌ Lost</span><span>60</span></div>
-          <div class="pipeline-bar"><div class="pipeline-fill" style="width:15.7%;background:#e74c3c;"></div></div>
-        </div>
+        <div id="pipelineRows"></div>
         <div style="margin-top:16px;padding-top:12px;border-top:1px solid var(--border);font-size:13px;display:flex;justify-content:space-between;">
           <span class="text-muted">Conversion rate</span>
-          <span class="font-bold text-green">34.8%</span>
+          <span id="conversionRate" class="font-bold text-green">—</span>
         </div>
       </div>
     </div>
@@ -501,46 +403,7 @@
         <span class="last-updated">19 days in</span>
       </div>
       <div class="card-body" style="padding: 0 20px 16px;">
-        <div class="goal-card">
-          <div class="goal-header">
-            <span>Premium Written</span>
-            <span class="goal-pct">78%</span>
-          </div>
-          <div style="font-size:11px;color:var(--muted);margin-bottom:6px;">$390K of $500K target</div>
-          <div class="goal-bar"><div class="goal-fill" style="width:78%;background:var(--az-teal);"></div></div>
-        </div>
-        <div class="goal-card">
-          <div class="goal-header">
-            <span>New Policies</span>
-            <span class="goal-pct">65%</span>
-          </div>
-          <div style="font-size:11px;color:var(--muted);margin-bottom:6px;">130 of 200 target</div>
-          <div class="goal-bar"><div class="goal-fill" style="width:65%;background:var(--az-green);"></div></div>
-        </div>
-        <div class="goal-card">
-          <div class="goal-header">
-            <span>Leads Generated</span>
-            <span class="goal-pct">91%</span>
-          </div>
-          <div style="font-size:11px;color:var(--muted);margin-bottom:6px;">382 of 420 target</div>
-          <div class="goal-bar"><div class="goal-fill" style="width:91%;background:var(--az-orange);"></div></div>
-        </div>
-        <div class="goal-card">
-          <div class="goal-header">
-            <span>Renewals Retained</span>
-            <span class="goal-pct">88%</span>
-          </div>
-          <div style="font-size:11px;color:var(--muted);margin-bottom:6px;">264 of 300 target</div>
-          <div class="goal-bar"><div class="goal-fill" style="width:88%;background:var(--az-purple);"></div></div>
-        </div>
-        <div class="goal-card">
-          <div class="goal-header">
-            <span>Cross-Sell Rate</span>
-            <span class="goal-pct">54%</span>
-          </div>
-          <div style="font-size:11px;color:var(--muted);margin-bottom:6px;">22% achieved, 40% target</div>
-          <div class="goal-bar"><div class="goal-fill" style="width:54%;background:var(--az-red);"></div></div>
-        </div>
+        <div id="goalsBody"></div>
       </div>
     </div>
   </div>
@@ -575,42 +438,9 @@
               <th class="text-right">Risk</th>
             </tr>
           </thead>
-          <tbody>
-            <tr>
-              <td><div style="font-size:13px;">Apex Plumbing LLC</div><div style="font-size:11px;color:var(--muted);">Renews Mar 1</div></td>
-              <td><span class="badge badge-orange">Comm.</span></td>
-              <td class="text-right font-bold">$8,450</td>
-              <td class="text-right"><span class="badge badge-orange">High</span></td>
-            </tr>
-            <tr>
-              <td><div style="font-size:13px;">Rivera Family</div><div style="font-size:11px;color:var(--muted);">Renews Mar 4</div></td>
-              <td><span class="badge badge-blue">Auto</span></td>
-              <td class="text-right font-bold">$2,210</td>
-              <td class="text-right"><span class="badge badge-orange">High</span></td>
-            </tr>
-            <tr>
-              <td><div style="font-size:13px;">Greenway Florist</div><div style="font-size:11px;color:var(--muted);">Renews Mar 8</div></td>
-              <td><span class="badge badge-orange">Comm.</span></td>
-              <td class="text-right font-bold">$4,800</td>
-              <td class="text-right"><span class="badge badge-gray">Med</span></td>
-            </tr>
-            <tr>
-              <td><div style="font-size:13px;">Thompson, K.</div><div style="font-size:11px;color:var(--muted);">Renews Mar 12</div></td>
-              <td><span class="badge badge-blue">Home</span></td>
-              <td class="text-right font-bold">$1,900</td>
-              <td class="text-right"><span class="badge badge-gray">Med</span></td>
-            </tr>
-            <tr>
-              <td><div style="font-size:13px;">Liu & Associates</div><div style="font-size:11px;color:var(--muted);">Renews Mar 18</div></td>
-              <td><span class="badge badge-orange">Comm.</span></td>
-              <td class="text-right font-bold">$12,100</td>
-              <td class="text-right"><span class="badge badge-green">Low</span></td>
-            </tr>
-          </tbody>
+          <tbody id="renewalsBody"></tbody>
         </table>
-        <div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border);font-size:12px;color:var(--muted);text-align:right;">
-          Showing top 5 of 28 at-risk renewals this month
-        </div>
+        <div id="renewalsFooter" style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border);font-size:12px;color:var(--muted);text-align:right;"></div>
       </div>
     </div>
   </div>
@@ -618,163 +448,208 @@
 </main>
 
 <script>
-/* ─── Data ──────────────────────────────────────── */
-const months = ['Aug','Sep','Oct','Nov','Dec','Jan','Feb'];
-
-const premiumData = {
-  newBiz:  [180,210,195,240,185,220,390],
-  renewal: [420,460,480,510,395,490,390],
-};
-const policyData = {
-  newBiz:  [62, 74, 68, 83, 61, 78, 133],
-  renewal: [148,162,171,188,145,182,264],
-};
-
-const producers = [
-  { name:'Sarah Kim',    initials:'SK', premium:92400, policies:47, close:42 },
-  { name:'Tom Rivera',   initials:'TR', premium:87100, policies:43, close:38 },
-  { name:'Rachel Moore', initials:'RM', premium:71300, policies:36, close:35 },
-  { name:'James Park',   initials:'JP', premium:58600, policies:29, close:31 },
-  { name:'Dana Okafor',  initials:'DO', premium:44200, policies:22, close:29 },
-  { name:'Chris Yuen',   initials:'CY', premium:36500, policies:18, close:27 },
-];
+/* ─── API base (same origin when served by Express) ── */
+const API = '/api/dashboard';
 
 /* ─── Helpers ───────────────────────────────────── */
-const fmt = v => '$' + (v>=1e6 ? (v/1e6).toFixed(2)+'M' : v>=1e3 ? (v/1e3).toFixed(0)+'K' : v);
+const fmt = v => '$' + (v>=1e6 ? (v/1e6).toFixed(2)+'M' : v>=1e3 ? Math.round(v/1e3)+'K' : v);
+const fmtDelta = d => d == null ? '' :
+  `<span class="kpi-delta ${d>=0?'up':'down'}">${d>=0?'▲':'▼'} ${Math.abs(d*100).toFixed(1)}%</span>`;
 const colors = {
   teal:'#0097b2', navy:'#1a3a5c', green:'#27ae60',
   orange:'#e67e22', red:'#e74c3c', purple:'#8e44ad',
 };
+const colorList = Object.values(colors);
 const FONT = "'Segoe UI','Helvetica Neue',sans-serif";
-
 Chart.defaults.font.family = FONT;
 Chart.defaults.color = '#64748b';
 
-/* ─── Trend Chart ───────────────────────────────── */
-let trendMode = 'premium';
-const trendCtx = document.getElementById('trendChart').getContext('2d');
-const trendChart = new Chart(trendCtx, {
-  type: 'bar',
-  data: buildTrendData('premium'),
-  options: {
-    responsive: true, maintainAspectRatio: false,
-    plugins: { legend:{ position:'bottom', labels:{ boxWidth:12, padding:16 } }, tooltip:{ mode:'index', intersect:false } },
-    scales: {
-      x:{ stacked:true, grid:{ display:false } },
-      y:{ stacked:true, ticks:{ callback: v => '$'+(v/1e3)+'K' }, grid:{ color:'#f1f5f9' } }
-    }
-  }
-});
+// Activity event type → icon + CSS class
+const ACT_ICON = {
+  policy_bound:         { icon:'✅', cls:'act-green'  },
+  lead_created:         { icon:'📋', cls:'act-blue'   },
+  renewal_confirmed:    { icon:'✅', cls:'act-green'  },
+  quote_sent:           { icon:'⏳', cls:'act-orange' },
+  policy_lost:          { icon:'❌', cls:'act-red'    },
+  endorsement:          { icon:'🔄', cls:'act-purple' },
+};
 
-function buildTrendData(mode) {
+function timeAgo(iso) {
+  const diff = Math.floor((Date.now() - new Date(iso)) / 1000);
+  if (diff < 60)   return `${diff}s ago`;
+  if (diff < 3600) return `${Math.floor(diff/60)} min ago`;
+  if (diff < 86400)return `${Math.floor(diff/3600)} hr ago`;
+  return new Date(iso).toLocaleDateString();
+}
+
+/* ─── Chart instances (module-level so switchTrend can update) ── */
+let trendChart, mixChart, producerBarChart, sourceChart;
+let trendData = {};   // cached from API
+let trendMode = 'premium';
+let allProducers = [];
+let producerMode = 'premium';
+
+/* ─── KPI Cards ─────────────────────────────────── */
+function renderKPIs(d) {
+  const cards = [
+    { id:'kpi-total-prem',    val: fmt(d.totalPremium),    delta: d.deltaTotal },
+    { id:'kpi-total-pol',     val: d.totalPolicies,        delta: d.deltaPolicies },
+    { id:'kpi-new-biz',       val: fmt(d.newBusinessPrem), delta: d.deltaNewBiz },
+    { id:'kpi-renewals',      val: fmt(d.renewalPrem),     delta: d.deltaRenewal },
+    { id:'kpi-leads',         val: d.leadsThisMonth,       delta: d.deltaLeads },
+    { id:'kpi-close',         val: d.closeRate.toFixed(1)+'%', delta: d.deltaClose },
+  ];
+  cards.forEach(({ id, val, delta }) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.querySelector('.kpi-value').textContent = val;
+    const sub = el.querySelector('.kpi-delta-wrap');
+    if (sub) sub.innerHTML = fmtDelta(delta);
+  });
+}
+
+/* ─── Trend Chart ───────────────────────────────── */
+function buildTrendDataset(mode) {
+  const labels = trendData.map(m => m.label);
   if (mode === 'premium') {
     return {
-      labels: months,
+      labels,
       datasets: [
-        { label:'New Business', data: premiumData.newBiz.map(v=>v*1000), backgroundColor: colors.teal, borderRadius:4 },
-        { label:'Renewals',     data: premiumData.renewal.map(v=>v*1000), backgroundColor: colors.navy, borderRadius:4 }
-      ]
-    };
-  } else {
-    return {
-      labels: months,
-      datasets: [
-        { label:'New Business', data: policyData.newBiz,  backgroundColor: colors.teal, borderRadius:4 },
-        { label:'Renewals',     data: policyData.renewal, backgroundColor: colors.navy, borderRadius:4 }
+        { label:'New Business', data: trendData.map(m=>m.newBizPremium),  backgroundColor:colors.teal, borderRadius:4 },
+        { label:'Renewals',     data: trendData.map(m=>m.renewalPremium), backgroundColor:colors.navy, borderRadius:4 },
       ]
     };
   }
+  return {
+    labels,
+    datasets: [
+      { label:'New Business', data: trendData.map(m=>m.newBizPolicies),  backgroundColor:colors.teal, borderRadius:4 },
+      { label:'Renewals',     data: trendData.map(m=>m.renewalPolicies), backgroundColor:colors.navy, borderRadius:4 },
+    ]
+  };
+}
+
+function initTrendChart() {
+  trendChart = new Chart(document.getElementById('trendChart').getContext('2d'), {
+    type: 'bar',
+    data: buildTrendDataset('premium'),
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{ position:'bottom', labels:{ boxWidth:12, padding:16 } }, tooltip:{ mode:'index', intersect:false } },
+      scales:{
+        x:{ stacked:true, grid:{ display:false } },
+        y:{ stacked:true, ticks:{ callback: v=>'$'+(v/1e3)+'K' }, grid:{ color:'#f1f5f9' } }
+      }
+    }
+  });
 }
 
 function switchTrend(btn, mode) {
-  document.querySelectorAll('#trendChart').forEach(()=>{});
   btn.closest('.tabs').querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   btn.classList.add('active');
   trendMode = mode;
-  trendChart.data = buildTrendData(mode);
+  trendChart.data = buildTrendDataset(mode);
   trendChart.options.scales.y.ticks.callback = mode==='premium' ? v=>'$'+(v/1e3)+'K' : v=>v;
   trendChart.update();
 }
 
 /* ─── Policy Mix Donut ──────────────────────────── */
-new Chart(document.getElementById('mixChart').getContext('2d'), {
-  type: 'doughnut',
-  data: {
-    labels:['Auto','Home','Life','Commercial','Other'],
-    datasets:[{ data:[512,337,229,189,80],
-      backgroundColor:[colors.teal,colors.navy,colors.green,colors.orange,colors.purple],
-      borderWidth:2, borderColor:'#fff', hoverOffset:6 }]
-  },
-  options: {
-    responsive:true, maintainAspectRatio:false, cutout:'68%',
-    plugins:{ legend:{ display:false }, tooltip:{ callbacks:{ label: ctx => ` ${ctx.label}: ${ctx.parsed}` } } }
+function initMixChart(lines) {
+  const labels  = lines.map(l => l.label);
+  const counts  = lines.map(l => l.count);
+  const bgColors = lines.map((_,i) => colorList[i % colorList.length]);
+
+  mixChart = new Chart(document.getElementById('mixChart').getContext('2d'), {
+    type: 'doughnut',
+    data: { labels, datasets:[{ data:counts, backgroundColor:bgColors, borderWidth:2, borderColor:'#fff', hoverOffset:6 }] },
+    options:{
+      responsive:true, maintainAspectRatio:false, cutout:'68%',
+      plugins:{ legend:{ display:false }, tooltip:{ callbacks:{ label: ctx=>` ${ctx.label}: ${ctx.parsed}` } } }
+    }
+  });
+
+  // Render legend below donut
+  const total = counts.reduce((a,b)=>a+b,0);
+  const legend = document.getElementById('mixLegend');
+  if (legend) {
+    legend.innerHTML = lines.map((l,i)=>`
+      <div style="display:flex;justify-content:space-between;font-size:13px;">
+        <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:${bgColors[i]};margin-right:6px;"></span>${l.label}</span>
+        <span class="font-bold">${l.count} <span class="text-muted">(${total>0?Math.round(l.count/total*100):0}%)</span></span>
+      </div>`).join('');
   }
-});
+
+  // Update policy count in header
+  const hdr = document.getElementById('mixPolicyCount');
+  if (hdr) hdr.textContent = total + ' policies';
+}
 
 /* ─── Producer Bar Chart ────────────────────────── */
-new Chart(document.getElementById('producerChart').getContext('2d'), {
-  type:'bar',
-  data:{
-    labels: producers.map(p=>p.name.split(' ')[0]),
-    datasets:[{ label:'Premium', data: producers.map(p=>p.premium),
-      backgroundColor:[colors.teal,colors.navy,colors.green,colors.orange,colors.purple,colors.red],
-      borderRadius:6 }]
-  },
-  options:{
-    responsive:true, maintainAspectRatio:false, indexAxis:'y',
-    plugins:{ legend:{ display:false }, tooltip:{ callbacks:{ label: ctx=>' '+fmt(ctx.parsed.x) } } },
-    scales:{
-      x:{ ticks:{ callback: v=>'$'+(v/1e3)+'K' }, grid:{ color:'#f1f5f9' } },
-      y:{ grid:{ display:false } }
+function initProducerBarChart(producers) {
+  producerBarChart = new Chart(document.getElementById('producerChart').getContext('2d'), {
+    type:'bar',
+    data:{
+      labels: producers.map(p=>p.name.split(' ')[0]),
+      datasets:[{ label:'Premium', data:producers.map(p=>p.premium),
+        backgroundColor: producers.map((_,i)=>colorList[i%colorList.length]),
+        borderRadius:6 }]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false, indexAxis:'y',
+      plugins:{ legend:{ display:false }, tooltip:{ callbacks:{ label: ctx=>' '+fmt(ctx.parsed.x) } } },
+      scales:{
+        x:{ ticks:{ callback: v=>'$'+(v/1e3)+'K' }, grid:{ color:'#f1f5f9' } },
+        y:{ grid:{ display:false } }
+      }
     }
-  }
-});
+  });
+}
 
-/* ─── Lead Source Bar Chart ─────────────────────── */
-new Chart(document.getElementById('sourceChart').getContext('2d'), {
-  type:'bar',
-  data:{
-    labels:['Referral','Web Form','Social','Cold Call','Event','Partner','Walk-in'],
-    datasets:[
-      { label:'Closed',  data:[148,87,52,38,24,19,8], backgroundColor:colors.teal, borderRadius:4 },
-      { label:'Lost',    data:[42,68,41,55,18,12,6],  backgroundColor:'#e74c3c',   borderRadius:4 },
-      { label:'Pending', data:[28,45,33,28,14,8,4],   backgroundColor:'#f59e0b',   borderRadius:4 },
-    ]
-  },
-  options:{
-    responsive:true, maintainAspectRatio:false,
-    plugins:{ legend:{ position:'bottom', labels:{ boxWidth:12, padding:12 } }, tooltip:{ mode:'index', intersect:false } },
-    scales:{
-      x:{ stacked:true, grid:{ display:false } },
-      y:{ stacked:true, grid:{ color:'#f1f5f9' } }
+/* ─── Lead Source Chart ─────────────────────────── */
+function initSourceChart(sources) {
+  sourceChart = new Chart(document.getElementById('sourceChart').getContext('2d'), {
+    type:'bar',
+    data:{
+      labels: sources.map(s=>s.source),
+      datasets:[
+        { label:'Closed',  data:sources.map(s=>s.closed),  backgroundColor:colors.teal,   borderRadius:4 },
+        { label:'Lost',    data:sources.map(s=>s.lost),    backgroundColor:colors.red,    borderRadius:4 },
+        { label:'Pending', data:sources.map(s=>s.pending), backgroundColor:'#f59e0b',     borderRadius:4 },
+      ]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{ position:'bottom', labels:{ boxWidth:12, padding:12 } }, tooltip:{ mode:'index', intersect:false } },
+      scales:{
+        x:{ stacked:true, grid:{ display:false } },
+        y:{ stacked:true, grid:{ color:'#f1f5f9' } }
+      }
     }
-  }
-});
+  });
+}
 
 /* ─── Producer Table ────────────────────────────── */
-let producerMode = 'premium';
 function renderProducerTable(mode) {
-  const sorted = [...producers].sort((a,b)=>b[mode]-a[mode]);
-  const max = sorted[0][mode];
-  const tbody = document.getElementById('producerBody');
-  tbody.innerHTML = sorted.map((p,i)=>{
-    const rankClass = ['rank-1','rank-2','rank-3','rank-n','rank-n','rank-n'][i];
+  const sorted = [...allProducers].sort((a,b)=>b[mode]-a[mode]);
+  const max = sorted[0]?.[mode] || 1;
+  document.getElementById('producerBody').innerHTML = sorted.map((p,i)=>{
+    const rankClass = ['rank-1','rank-2','rank-3','rank-n','rank-n','rank-n'][i] || 'rank-n';
     const pct = Math.round((p[mode]/max)*100);
     return `
       <tr>
         <td><span class="rank-badge ${rankClass}">${i+1}</span></td>
         <td>
           <div style="display:flex;align-items:center;gap:8px;">
-            <div style="width:28px;height:28px;border-radius:50%;background:${Object.values(colors)[i]};display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;">${p.initials}</div>
+            <div style="width:28px;height:28px;border-radius:50%;background:${colorList[i%colorList.length]};display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;">${p.initials}</div>
             <div>
               <div style="font-size:13px;font-weight:600;">${p.name}</div>
-              <div class="bar-mini" style="width:80px;"><div class="bar-fill" style="width:${pct}%;background:${Object.values(colors)[i]};"></div></div>
+              <div class="bar-mini" style="width:80px;"><div class="bar-fill" style="width:${pct}%;background:${colorList[i%colorList.length]};"></div></div>
             </div>
           </div>
         </td>
         <td class="text-right font-bold">${fmt(p.premium)}</td>
         <td class="text-right">${p.policies}</td>
-        <td class="text-right"><span class="${p.close>=35?'text-green':p.close>=30?'':'text-red'} font-bold">${p.close}%</span></td>
+        <td class="text-right"><span class="${p.closeRate>=35?'text-green':p.closeRate<30?'text-red':''} font-bold">${p.closeRate}%</span></td>
       </tr>`;
   }).join('');
 }
@@ -786,7 +661,118 @@ function switchProducer(btn, mode) {
   renderProducerTable(mode);
 }
 
-renderProducerTable('premium');
+/* ─── Pipeline ──────────────────────────────────── */
+function renderPipeline(p) {
+  const stages = [
+    { label:'🔵 New Leads',   key:'new',       color:'#0097b2' },
+    { label:'🟡 Contacted',   key:'contacted',  color:'#f59e0b' },
+    { label:'🟠 Quoted',      key:'quoted',     color:'#e67e22' },
+    { label:'🟢 Proposal',    key:'proposal',   color:'#27ae60' },
+    { label:'✅ Closed Won',  key:'won',        color:'#1a3a5c' },
+    { label:'❌ Lost',        key:'lost',       color:'#e74c3c' },
+  ];
+  const total = p.new || 1;
+  const el = document.getElementById('pipelineRows');
+  if (!el) return;
+  el.innerHTML = stages.map(s=>`
+    <div class="pipeline-row">
+      <div class="pipeline-label"><span>${s.label}</span><span>${p[s.key] ?? 0}</span></div>
+      <div class="pipeline-bar"><div class="pipeline-fill" style="width:${Math.round((p[s.key]??0)/total*100)}%;background:${s.color};"></div></div>
+    </div>`).join('');
+
+  const cr = document.getElementById('conversionRate');
+  if (cr) cr.textContent = p.conversionRate + '%';
+}
+
+/* ─── Goals ─────────────────────────────────────── */
+function renderGoals(goals) {
+  const goalColors = [colors.teal, colors.green, colors.orange, colors.purple, colors.red];
+  const el = document.getElementById('goalsBody');
+  if (!el || !goals.length) return;
+  el.innerHTML = goals.map((g,i)=>`
+    <div class="goal-card">
+      <div class="goal-header">
+        <span>${g.name}</span>
+        <span class="goal-pct">${g.pct}%</span>
+      </div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:6px;">
+        ${g.unit==='currency'?fmt(g.achieved):g.achieved} of ${g.unit==='currency'?fmt(g.target):g.target} target
+      </div>
+      <div class="goal-bar"><div class="goal-fill" style="width:${Math.min(g.pct,100)}%;background:${goalColors[i%goalColors.length]};"></div></div>
+    </div>`).join('');
+}
+
+/* ─── Activity Feed ─────────────────────────────── */
+function renderActivity(activities) {
+  const el = document.getElementById('activityFeed');
+  if (!el) return;
+  el.innerHTML = activities.map(a=>{
+    const { icon, cls } = ACT_ICON[a.type] ?? { icon:'📌', cls:'act-blue' };
+    const typeLabel = a.type.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
+    return `
+      <div class="activity-item">
+        <div class="act-icon ${cls}">${icon}</div>
+        <div class="act-body">
+          <div class="act-text"><strong>${typeLabel}</strong> – ${a.description}</div>
+          <div class="act-time">${timeAgo(a.occurredAt)}${a.producerName?' · '+a.producerName:''}${a.premium?' · '+fmt(a.premium)+'/yr':''}</div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+/* ─── Renewals at Risk ──────────────────────────── */
+function renderRenewals(renewals) {
+  const el = document.getElementById('renewalsBody');
+  if (!el) return;
+  const riskBadge = { high:'badge-orange', medium:'badge-gray', low:'badge-green' };
+  el.innerHTML = renewals.slice(0,5).map(r=>`
+    <tr>
+      <td>
+        <div style="font-size:13px;">${r.insuredName}</div>
+        <div style="font-size:11px;color:var(--muted);">Renews ${new Date(r.renewalDate).toLocaleDateString('en-US',{month:'short',day:'numeric'})}</div>
+      </td>
+      <td><span class="badge badge-blue">${r.line}</span></td>
+      <td class="text-right font-bold">${fmt(r.premium)}</td>
+      <td class="text-right"><span class="badge ${riskBadge[r.riskLevel]??'badge-gray'}">${r.riskLevel.charAt(0).toUpperCase()+r.riskLevel.slice(1)}</span></td>
+    </tr>`).join('');
+
+  const footer = document.getElementById('renewalsFooter');
+  if (footer) footer.textContent = `Showing top 5 of ${renewals.length} at-risk renewals this month`;
+}
+
+/* ─── Error / Loading states ────────────────────── */
+function showError(msg) {
+  const el = document.getElementById('globalError');
+  if (el) { el.textContent = '⚠ ' + msg; el.style.display = 'block'; }
+  console.error(msg);
+}
+
+/* ─── Main loader ───────────────────────────────── */
+async function loadDashboard() {
+  try {
+    const res  = await fetch(`${API}/all`);
+    if (!res.ok) throw new Error(`Server returned ${res.status}`);
+    const data = await res.json();
+
+    trendData    = data.trend;
+    allProducers = data.producers;
+
+    renderKPIs(data.kpis);
+    initTrendChart();
+    initMixChart(data.policyMix);
+    initProducerBarChart(data.producers);
+    initSourceChart(data.leadSources);
+    renderProducerTable('premium');
+    renderPipeline(data.pipeline);
+    renderGoals(data.goals);
+    renderActivity(data.activity);
+    renderRenewals(data.renewalsAtRisk);
+  } catch (err) {
+    showError('Could not load dashboard data: ' + err.message);
+  }
+}
+
+loadDashboard();
 </script>
 </body>
 </html>
