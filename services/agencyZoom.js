@@ -12,7 +12,8 @@
 const fetch = require('node-fetch');
 const { cacheGet, cacheSet } = require('../db/index');
 
-const BASE_URL = process.env.AZ_BASE_URL || 'https://api.agencyzoom.com/v1';
+// Spec server: https://api.agencyzoom.com  All paths: /v1/api/...
+const BASE_URL = process.env.AZ_BASE_URL || 'https://api.agencyzoom.com/v1/api';
 const API_KEY  = process.env.AZ_API_KEY;
 
 // Cache TTLs (seconds)
@@ -43,6 +44,27 @@ async function azFetch(path, params = {}) {
   if (!res.ok) {
     const body = await res.text();
     throw new Error(`AgencyZoom API ${res.status} on ${path}: ${body}`);
+  }
+
+  return res.json();
+}
+
+async function azPost(path, body = {}) {
+  if (!API_KEY) throw new Error('AZ_API_KEY is not set in environment variables.');
+
+  const res = await fetch(`${BASE_URL}${path}`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${API_KEY}`,
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    },
+    body: JSON.stringify(body),
+  });
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`AgencyZoom API ${res.status} on POST ${path}: ${text}`);
   }
 
   return res.json();
@@ -83,7 +105,9 @@ function monthRange() {
 
 /**
  * KPI summary for the YTD header cards.
- * AgencyZoom endpoint: GET /reports/summary
+ * NOTE: The public AgencyZoom API has no aggregate reporting endpoint.
+ * The DashboardData/SalesProgress schemas exist in the spec but their
+ * path is not published. This will 404 until AZ provides the endpoint.
  */
 async function getKPIs() {
   return withCache('kpis:ytd', TTL.kpis, async () => {
@@ -111,7 +135,8 @@ async function getKPIs() {
 
 /**
  * Monthly premium & policy count for the last 7 months.
- * AgencyZoom endpoint: GET /reports/trend
+ * NOTE: No equivalent endpoint in the public AgencyZoom API spec.
+ * Will 404 until AZ exposes an aggregate trend endpoint.
  */
 async function getTrend() {
   return withCache('trend:7m', TTL.trend, async () => {
@@ -131,7 +156,9 @@ async function getTrend() {
 
 /**
  * Top producers ranked by YTD premium.
- * AgencyZoom endpoint: GET /reports/producers
+ * NOTE: GET /v1/api/employees lists producers but has no sales metrics.
+ * No aggregate sales-by-producer report exists in the public API.
+ * Will 404 until AZ exposes a producer performance endpoint.
  */
 async function getProducers() {
   return withCache('producers:ytd', TTL.producers, async () => {
@@ -150,53 +177,73 @@ async function getProducers() {
 }
 
 /**
- * Lead pipeline stage counts for this month.
- * AgencyZoom endpoint: GET /leads/pipeline
+ * Lead pipeline stage counts by AZ lead status.
+ * AgencyZoom endpoint: POST /v1/api/leads/pipeline-count (LeadSearchRequest body)
+ * AZ lead statuses: 0=NEW, 1=QUOTED, 2=WON, 3=LOST, 4=CONTACTED
+ * Response per call: { leadsCount: [{workflowStageId, count}] }
+ * We sum all workflowStage counts to get the total for each status.
  */
 async function getPipeline() {
   return withCache('pipeline:month', TTL.pipeline, async () => {
-    const { start_date, end_date } = monthRange();
-    const data = await azFetch('/leads/pipeline', { start_date, end_date });
+    const sumCount = d => (d?.leadsCount ?? []).reduce((s, l) => s + (l.count ?? 0), 0);
 
-    // Expect: { stages: [{name, count}] }
-    const stageMap = {};
-    (data.stages ?? []).forEach(s => { stageMap[s.name] = s.count; });
+    const [newData, contactedData, quotedData, wonData, lostData] = await Promise.all([
+      azPost('/leads/pipeline-count', { status: 0 }),  // NEW
+      azPost('/leads/pipeline-count', { status: 4 }),  // CONTACTED
+      azPost('/leads/pipeline-count', { status: 1 }),  // QUOTED
+      azPost('/leads/pipeline-count', { status: 2 }),  // WON
+      azPost('/leads/pipeline-count', { status: 3 }),  // LOST
+    ]);
 
-    const total = stageMap['new'] ?? 0;
+    const counts = {
+      new:       sumCount(newData),
+      contacted: sumCount(contactedData),
+      quoted:    sumCount(quotedData),
+      proposal:  0,               // No direct AZ status equivalent
+      won:       sumCount(wonData),
+      lost:      sumCount(lostData),
+    };
+
+    // Conversion rate = won ÷ all leads ever entered (won + active + lost)
+    const total = counts.new + counts.contacted + counts.quoted;
+    const allTime = total + counts.won + counts.lost;
     return {
-      new:       stageMap['new']       ?? 0,
-      contacted: stageMap['contacted'] ?? 0,
-      quoted:    stageMap['quoted']    ?? 0,
-      proposal:  stageMap['proposal']  ?? 0,
-      won:       stageMap['won']       ?? 0,
-      lost:      stageMap['lost']      ?? 0,
+      ...counts,
       total,
-      conversionRate: total > 0 ? ((stageMap['won'] ?? 0) / total * 100).toFixed(1) : '0.0',
+      conversionRate: allTime > 0 ? (counts.won / allTime * 100).toFixed(1) : '0.0',
     };
   });
 }
 
 /**
- * Policy count broken down by line of business (YTD).
- * AgencyZoom endpoint: GET /reports/policy-mix
+ * Policy count broken down by line of business.
+ * No aggregate endpoint exists in the public API, so we:
+ *   1. GET /v1/api/product-lines  — fetch all defined policy types
+ *   2. POST /v1/api/customers (pageSize:1, policyType:id) — get totalCount
+ *      of active customers per policy type as a proxy for policy count.
+ * Premium is not available via this approach.
  */
 async function getPolicyMix() {
   return withCache('policymix:ytd', TTL.policyMix, async () => {
-    const { start_date, end_date } = ytdRange();
-    const data = await azFetch('/reports/policy-mix', { start_date, end_date });
+    const productLines = await azFetch('/product-lines');
+    // productLines: [{ id, name, productCategoryId, standardProductLineCode }]
 
-    // Expect: { lines: [{line_of_business, count, premium}] }
-    return (data.lines ?? []).map(l => ({
-      label:   l.line_of_business,
-      count:   l.count   ?? 0,
-      premium: l.premium ?? 0,
-    }));
+    const lines = await Promise.all(
+      productLines.map(line =>
+        azPost('/customers', { policyType: line.id, pageSize: 1, status: 1 })
+          .then(res => ({ label: line.name, count: res.totalCount ?? 0, premium: 0 }))
+          .catch(()  => ({ label: line.name, count: 0,                  premium: 0 }))
+      )
+    );
+
+    return lines.filter(l => l.count > 0);
   });
 }
 
 /**
  * Goal progress for the current month.
- * AgencyZoom endpoint: GET /goals/current
+ * NOTE: No goals endpoint exists in the public AgencyZoom API spec.
+ * Will 404 until AZ exposes a goals/progress endpoint.
  */
 async function getGoals() {
   return withCache('goals:month', TTL.goals, async () => {
