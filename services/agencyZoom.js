@@ -18,12 +18,8 @@ const API_KEY  = process.env.AZ_API_KEY;
 
 // Cache TTLs (seconds)
 const TTL = {
-  kpis:      300,   // 5 min
-  trend:     600,   // 10 min
-  producers: 300,
   pipeline:  180,   // 3 min — leads change often
-  policyMix: 600,
-  goals:     300,
+  policyMix: 600,   // 10 min
 };
 
 // ── Low-level request ─────────────────────────────────────────────────────────
@@ -80,101 +76,7 @@ async function withCache(key, ttl, fn) {
   return data;
 }
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
-
-function ytdRange() {
-  const now = new Date();
-  return {
-    start_date: `${now.getFullYear()}-01-01`,
-    end_date:   now.toISOString().slice(0, 10),
-  };
-}
-
-function monthRange() {
-  const now = new Date();
-  const y = now.getFullYear();
-  const m = String(now.getMonth() + 1).padStart(2, '0');
-  const lastDay = new Date(y, now.getMonth() + 1, 0).getDate();
-  return {
-    start_date: `${y}-${m}-01`,
-    end_date:   `${y}-${m}-${lastDay}`,
-  };
-}
-
 // ── Public API ────────────────────────────────────────────────────────────────
-
-/**
- * KPI summary for the YTD header cards.
- * NOTE: The public AgencyZoom API has no aggregate reporting endpoint.
- * The DashboardData/SalesProgress schemas exist in the spec but their
- * path is not published. This will 404 until AZ provides the endpoint.
- */
-async function getKPIs() {
-  return withCache('kpis:ytd', TTL.kpis, async () => {
-    const { start_date, end_date } = ytdRange();
-    const data = await azFetch('/reports/summary', { start_date, end_date });
-
-    // Normalise to dashboard shape
-    return {
-      totalPremium:    data.total_premium_written   ?? 0,
-      totalPolicies:   data.total_policies_issued   ?? 0,
-      newBusinessPrem: data.new_business_premium    ?? 0,
-      renewalPrem:     data.renewal_premium         ?? 0,
-      leadsThisMonth:  data.leads_this_month        ?? 0,
-      closeRate:       data.close_rate_30d          ?? 0,
-      // YoY deltas returned as decimal fractions e.g. 0.124 = +12.4%
-      deltaTotal:      data.delta_total_premium     ?? null,
-      deltaPolicies:   data.delta_total_policies    ?? null,
-      deltaNewBiz:     data.delta_new_business      ?? null,
-      deltaRenewal:    data.delta_renewals          ?? null,
-      deltaLeads:      data.delta_leads             ?? null,
-      deltaClose:      data.delta_close_rate        ?? null,
-    };
-  });
-}
-
-/**
- * Monthly premium & policy count for the last 7 months.
- * NOTE: No equivalent endpoint in the public AgencyZoom API spec.
- * Will 404 until AZ exposes an aggregate trend endpoint.
- */
-async function getTrend() {
-  return withCache('trend:7m', TTL.trend, async () => {
-    const data = await azFetch('/reports/trend', { period: 'monthly', months: 7 });
-
-    // Expect: { months: [{label, new_business_premium, renewal_premium,
-    //                      new_business_policies, renewal_policies}] }
-    return (data.months ?? []).map(m => ({
-      label:           m.label,
-      newBizPremium:   m.new_business_premium  ?? 0,
-      renewalPremium:  m.renewal_premium       ?? 0,
-      newBizPolicies:  m.new_business_policies ?? 0,
-      renewalPolicies: m.renewal_policies      ?? 0,
-    }));
-  });
-}
-
-/**
- * Top producers ranked by YTD premium.
- * NOTE: GET /v1/api/employees lists producers but has no sales metrics.
- * No aggregate sales-by-producer report exists in the public API.
- * Will 404 until AZ exposes a producer performance endpoint.
- */
-async function getProducers() {
-  return withCache('producers:ytd', TTL.producers, async () => {
-    const { start_date, end_date } = ytdRange();
-    const data = await azFetch('/reports/producers', { start_date, end_date });
-
-    return (data.producers ?? []).map(p => ({
-      id:        p.id,
-      name:      p.name,
-      initials:  p.name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase(),
-      premium:   p.total_premium   ?? 0,
-      policies:  p.total_policies  ?? 0,
-      closeRate: p.close_rate      ?? 0,
-    }));
-  });
-}
 
 /**
  * Lead pipeline stage counts by AZ lead status.
@@ -240,31 +142,7 @@ async function getPolicyMix() {
   });
 }
 
-/**
- * Goal progress for the current month.
- * NOTE: No goals endpoint exists in the public AgencyZoom API spec.
- * Will 404 until AZ exposes a goals/progress endpoint.
- */
-async function getGoals() {
-  return withCache('goals:month', TTL.goals, async () => {
-    const data = await azFetch('/goals/current');
-
-    // Expect: { goals: [{name, target, achieved, unit}] }
-    return (data.goals ?? []).map(g => ({
-      name:     g.name,
-      target:   g.target,
-      achieved: g.achieved,
-      unit:     g.unit,       // 'currency' | 'count' | 'percent'
-      pct:      g.target > 0 ? Math.round((g.achieved / g.target) * 100) : 0,
-    }));
-  });
-}
-
 module.exports = {
-  getKPIs,
-  getTrend,
-  getProducers,
   getPipeline,
   getPolicyMix,
-  getGoals,
 };

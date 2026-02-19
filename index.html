@@ -76,57 +76,10 @@
     /* ── Layout ──────────────────────────────────── */
     main { padding: 24px; max-width: 1400px; margin: 0 auto; }
 
-    .section-title {
-      font-size: 13px; font-weight: 600; text-transform: uppercase;
-      letter-spacing: .8px; color: var(--muted); margin-bottom: 12px;
-    }
-
-    /* ── KPI Cards ───────────────────────────────── */
-    .kpi-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
-      gap: 16px;
-      margin-bottom: 28px;
-    }
-    .kpi-card {
-      background: var(--card);
-      border-radius: var(--radius);
-      padding: 20px;
-      box-shadow: var(--shadow);
-      border: 1px solid var(--border);
-      position: relative;
-      overflow: hidden;
-    }
-    .kpi-card::after {
-      content: '';
-      position: absolute; top: 0; left: 0;
-      width: 4px; height: 100%;
-    }
-    .kpi-card.blue::after   { background: var(--az-teal); }
-    .kpi-card.green::after  { background: var(--az-green); }
-    .kpi-card.orange::after { background: var(--az-orange); }
-    .kpi-card.red::after    { background: var(--az-red); }
-    .kpi-card.purple::after { background: var(--az-purple); }
-    .kpi-card.navy::after   { background: var(--az-blue); }
-
-    .kpi-label { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .6px; color: var(--muted); }
-    .kpi-value { font-size: 28px; font-weight: 800; margin: 6px 0 4px; color: var(--text); }
-    .kpi-sub   { font-size: 12px; color: var(--muted); }
-    .kpi-delta {
-      display: inline-flex; align-items: center; gap: 3px;
-      font-size: 12px; font-weight: 600;
-      padding: 2px 8px; border-radius: 12px; margin-left: 6px;
-    }
-    .up   { background: #dcfce7; color: #16a34a; }
-    .down { background: #fee2e2; color: #dc2626; }
-
     /* ── Two-column section ──────────────────────── */
-    .two-col { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 28px; }
-    .three-col { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 28px; }
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 28px; }
 
-    @media (max-width: 1100px) { .two-col   { grid-template-columns: 1fr; } }
-    @media (max-width: 900px)  { .three-col { grid-template-columns: 1fr 1fr; } }
-    @media (max-width: 600px)  { .three-col { grid-template-columns: 1fr; } .kpi-value { font-size: 22px; } }
+    @media (max-width: 900px) { .two-col { grid-template-columns: 1fr; } }
 
     /* ── Chart Cards ─────────────────────────────── */
     .card {
@@ -145,65 +98,6 @@
     .card-body { padding: 20px; }
     .chart-wrap { position: relative; }
 
-    /* ── Tabs ────────────────────────────────────── */
-    .tabs { display: flex; gap: 2px; }
-    .tab {
-      padding: 5px 12px; border-radius: 6px; font-size: 12px; font-weight: 600;
-      border: none; background: transparent; color: var(--muted); cursor: pointer;
-      transition: all .15s;
-    }
-    .tab.active { background: var(--az-teal); color: #fff; }
-    .tab:hover:not(.active) { background: #f1f5f9; color: var(--text); }
-
-    /* ── Producer Table ──────────────────────────── */
-    .producer-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-    .producer-table th {
-      text-align: left; padding: 8px 12px;
-      font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px;
-      color: var(--muted); border-bottom: 1px solid var(--border);
-    }
-    .producer-table td { padding: 10px 12px; border-bottom: 1px solid #f1f5f9; }
-    .producer-table tr:last-child td { border-bottom: none; }
-    .producer-table tr:hover td { background: #f8fafc; }
-    .rank-badge {
-      display: inline-flex; align-items: center; justify-content: center;
-      width: 22px; height: 22px; border-radius: 50%;
-      font-size: 11px; font-weight: 800;
-    }
-    .rank-1 { background: #fef3c7; color: #d97706; }
-    .rank-2 { background: #f1f5f9; color: #64748b; }
-    .rank-3 { background: #fff7ed; color: #c2410c; }
-    .rank-n { background: #f1f5f9; color: #94a3b8; }
-    .bar-mini { background: #f1f5f9; border-radius: 99px; height: 6px; margin-top: 4px; overflow: hidden; }
-    .bar-fill  { height: 100%; border-radius: 99px; background: var(--az-teal); }
-    .status-dot {
-      display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 5px;
-    }
-    .dot-green  { background: var(--az-green); }
-    .dot-orange { background: var(--az-orange); }
-    .dot-red    { background: var(--az-red); }
-
-    /* ── Activity Feed ───────────────────────────── */
-    .activity-list { display: flex; flex-direction: column; gap: 0; }
-    .activity-item {
-      display: flex; align-items: flex-start; gap: 12px;
-      padding: 12px 0; border-bottom: 1px solid #f1f5f9;
-    }
-    .activity-item:last-child { border-bottom: none; }
-    .act-icon {
-      width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0;
-      display: flex; align-items: center; justify-content: center; font-size: 15px;
-    }
-    .act-green  { background: #dcfce7; }
-    .act-blue   { background: #dbeafe; }
-    .act-orange { background: #ffedd5; }
-    .act-red    { background: #fee2e2; }
-    .act-purple { background: #f3e8ff; }
-    .act-body { flex: 1; min-width: 0; }
-    .act-text { font-size: 13px; color: var(--text); line-height: 1.4; }
-    .act-text strong { font-weight: 600; }
-    .act-time { font-size: 11px; color: var(--muted); margin-top: 2px; }
-
     /* ── Pipeline Funnel ─────────────────────────── */
     .pipeline-row { margin-bottom: 14px; }
     .pipeline-label {
@@ -214,28 +108,10 @@
     .pipeline-bar { height: 10px; background: #f1f5f9; border-radius: 99px; overflow: hidden; }
     .pipeline-fill { height: 100%; border-radius: 99px; transition: width .6s ease; }
 
-    /* ── Goal Progress ───────────────────────────── */
-    .goal-card { padding: 16px 0; border-bottom: 1px solid #f1f5f9; }
-    .goal-card:last-child { border-bottom: none; }
-    .goal-header { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 6px; }
-    .goal-pct { font-weight: 700; color: var(--az-blue); }
-    .goal-bar { height: 8px; background: #f1f5f9; border-radius: 99px; overflow: hidden; }
-    .goal-fill { height: 100%; border-radius: 99px; }
-
     /* ── Utility ─────────────────────────────────── */
     .text-green  { color: var(--az-green); }
-    .text-red    { color: var(--az-red); }
     .text-muted  { color: var(--muted); }
     .font-bold   { font-weight: 700; }
-    .text-right  { text-align: right; }
-    .badge {
-      display: inline-block; padding: 2px 8px; border-radius: 10px;
-      font-size: 11px; font-weight: 600;
-    }
-    .badge-green  { background: #dcfce7; color: #16a34a; }
-    .badge-orange { background: #ffedd5; color: #c2410c; }
-    .badge-blue   { background: #dbeafe; color: #1d4ed8; }
-    .badge-gray   { background: #f1f5f9; color: #64748b; }
     .last-updated { font-size: 11px; color: var(--muted); }
   </style>
 </head>
@@ -256,116 +132,21 @@
 <!-- ══ Main ════════════════════════════════════════ -->
 <main>
 
-  <!-- KPI Row -->
-  <p class="section-title">Key Performance Indicators</p>
   <div id="globalError" style="display:none;background:#fee2e2;color:#991b1b;padding:10px 16px;border-radius:8px;margin-bottom:16px;font-size:13px;"></div>
-  <div class="kpi-grid">
-    <div id="kpi-total-prem" class="kpi-card blue">
-      <div class="kpi-label">Total Premium Written</div>
-      <div class="kpi-value">—</div>
-      <div class="kpi-sub">YTD 2026 <span class="kpi-delta-wrap"></span></div>
-    </div>
-    <div id="kpi-total-pol" class="kpi-card green">
-      <div class="kpi-label">Policies Issued</div>
-      <div class="kpi-value">—</div>
-      <div class="kpi-sub">YTD 2026 <span class="kpi-delta-wrap"></span></div>
-    </div>
-    <div id="kpi-new-biz" class="kpi-card orange">
-      <div class="kpi-label">New Business</div>
-      <div class="kpi-value">—</div>
-      <div class="kpi-sub">Premium <span class="kpi-delta-wrap"></span></div>
-    </div>
-    <div id="kpi-renewals" class="kpi-card navy">
-      <div class="kpi-label">Renewals</div>
-      <div class="kpi-value">—</div>
-      <div class="kpi-sub">Premium <span class="kpi-delta-wrap"></span></div>
-    </div>
-    <div id="kpi-leads" class="kpi-card purple">
-      <div class="kpi-label">Leads This Month</div>
-      <div class="kpi-value">—</div>
-      <div class="kpi-sub">Current month <span class="kpi-delta-wrap"></span></div>
-    </div>
-    <div id="kpi-close" class="kpi-card red">
-      <div class="kpi-label">Close Rate</div>
-      <div class="kpi-value">—</div>
-      <div class="kpi-sub">30-day avg <span class="kpi-delta-wrap"></span></div>
-    </div>
-  </div>
 
-  <!-- Premium Trend + Policy Mix -->
   <div class="two-col">
-    <!-- Monthly Premium Trend -->
-    <div class="card">
-      <div class="card-header">
-        <h3>Monthly Premium Trend</h3>
-        <div class="tabs">
-          <button class="tab active" onclick="switchTrend(this,'premium')">Premium</button>
-          <button class="tab" onclick="switchTrend(this,'policies')">Policies</button>
-        </div>
-      </div>
-      <div class="card-body">
-        <div class="chart-wrap" style="height:260px">
-          <canvas id="trendChart"></canvas>
-        </div>
-      </div>
-    </div>
 
     <!-- Policy Mix -->
     <div class="card">
       <div class="card-header">
-        <h3>Policy Mix (YTD)</h3>
+        <h3>Policy Mix</h3>
         <span id="mixPolicyCount" class="last-updated">— policies</span>
       </div>
       <div class="card-body">
-        <div class="chart-wrap" style="height:200px">
+        <div class="chart-wrap" style="height:220px">
           <canvas id="mixChart"></canvas>
         </div>
         <div id="mixLegend" style="margin-top:16px;display:flex;flex-direction:column;gap:8px;"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Top Producers + Activity Feed -->
-  <div class="two-col">
-    <!-- Top Producers -->
-    <div class="card">
-      <div class="card-header">
-        <h3>Top Producers</h3>
-        <div class="tabs">
-          <button class="tab active" onclick="switchProducer(this,'premium')">By Premium</button>
-          <button class="tab" onclick="switchProducer(this,'policies')">By Policies</button>
-        </div>
-      </div>
-      <div class="card-body" style="padding:0 0 8px 0;">
-        <table class="producer-table">
-          <thead>
-            <tr>
-              <th style="width:36px">#</th>
-              <th>Producer</th>
-              <th class="text-right">Premium</th>
-              <th class="text-right">Policies</th>
-              <th class="text-right">Close %</th>
-            </tr>
-          </thead>
-          <tbody id="producerBody">
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-  </div>
-
-  <!-- Sales by Producer Chart + Pipeline + Goals -->
-  <div class="three-col">
-    <!-- Bar chart -->
-    <div class="card">
-      <div class="card-header">
-        <h3>Sales by Producer (Feb)</h3>
-      </div>
-      <div class="card-body">
-        <div class="chart-wrap" style="height:220px">
-          <canvas id="producerChart"></canvas>
-        </div>
       </div>
     </div>
 
@@ -373,7 +154,7 @@
     <div class="card">
       <div class="card-header">
         <h3>Lead Pipeline</h3>
-        <span class="last-updated">382 leads</span>
+        <span id="pipelineTotal" class="last-updated">— leads</span>
       </div>
       <div class="card-body">
         <div id="pipelineRows"></div>
@@ -384,18 +165,7 @@
       </div>
     </div>
 
-    <!-- Monthly Goals -->
-    <div class="card">
-      <div class="card-header">
-        <h3>Monthly Goals (Feb 2026)</h3>
-        <span class="last-updated">19 days in</span>
-      </div>
-      <div class="card-body" style="padding: 0 20px 16px;">
-        <div id="goalsBody"></div>
-      </div>
-    </div>
   </div>
-
 
 </main>
 
@@ -403,10 +173,7 @@
 /* ─── API base (same origin when served by Express) ── */
 const API = '/api/dashboard';
 
-/* ─── Helpers ───────────────────────────────────── */
-const fmt = v => '$' + (v>=1e6 ? (v/1e6).toFixed(2)+'M' : v>=1e3 ? Math.round(v/1e3)+'K' : v);
-const fmtDelta = d => d == null ? '' :
-  `<span class="kpi-delta ${d>=0?'up':'down'}">${d>=0?'▲':'▼'} ${Math.abs(d*100).toFixed(1)}%</span>`;
+/* ─── Chart palette ─────────────────────────────── */
 const colors = {
   teal:'#0097b2', navy:'#1a3a5c', green:'#27ae60',
   orange:'#e67e22', red:'#e74c3c', purple:'#8e44ad',
@@ -416,84 +183,13 @@ const FONT = "'Segoe UI','Helvetica Neue',sans-serif";
 Chart.defaults.font.family = FONT;
 Chart.defaults.color = '#64748b';
 
-/* ─── Chart instances (module-level so switchTrend can update) ── */
-let trendChart, mixChart, producerBarChart;
-let trendData = {};   // cached from API
-let trendMode = 'premium';
-let allProducers = [];
-let producerMode = 'premium';
-
-/* ─── KPI Cards ─────────────────────────────────── */
-function renderKPIs(d) {
-  const cards = [
-    { id:'kpi-total-prem',    val: fmt(d.totalPremium),    delta: d.deltaTotal },
-    { id:'kpi-total-pol',     val: d.totalPolicies,        delta: d.deltaPolicies },
-    { id:'kpi-new-biz',       val: fmt(d.newBusinessPrem), delta: d.deltaNewBiz },
-    { id:'kpi-renewals',      val: fmt(d.renewalPrem),     delta: d.deltaRenewal },
-    { id:'kpi-leads',         val: d.leadsThisMonth,       delta: d.deltaLeads },
-    { id:'kpi-close',         val: d.closeRate.toFixed(1)+'%', delta: d.deltaClose },
-  ];
-  cards.forEach(({ id, val, delta }) => {
-    const el = document.getElementById(id);
-    if (!el) return;
-    el.querySelector('.kpi-value').textContent = val;
-    const sub = el.querySelector('.kpi-delta-wrap');
-    if (sub) sub.innerHTML = fmtDelta(delta);
-  });
-}
-
-/* ─── Trend Chart ───────────────────────────────── */
-function buildTrendDataset(mode) {
-  const labels = trendData.map(m => m.label);
-  if (mode === 'premium') {
-    return {
-      labels,
-      datasets: [
-        { label:'New Business', data: trendData.map(m=>m.newBizPremium),  backgroundColor:colors.teal, borderRadius:4 },
-        { label:'Renewals',     data: trendData.map(m=>m.renewalPremium), backgroundColor:colors.navy, borderRadius:4 },
-      ]
-    };
-  }
-  return {
-    labels,
-    datasets: [
-      { label:'New Business', data: trendData.map(m=>m.newBizPolicies),  backgroundColor:colors.teal, borderRadius:4 },
-      { label:'Renewals',     data: trendData.map(m=>m.renewalPolicies), backgroundColor:colors.navy, borderRadius:4 },
-    ]
-  };
-}
-
-function initTrendChart() {
-  trendChart = new Chart(document.getElementById('trendChart').getContext('2d'), {
-    type: 'bar',
-    data: buildTrendDataset('premium'),
-    options: {
-      responsive:true, maintainAspectRatio:false,
-      plugins:{ legend:{ position:'bottom', labels:{ boxWidth:12, padding:16 } }, tooltip:{ mode:'index', intersect:false } },
-      scales:{
-        x:{ stacked:true, grid:{ display:false } },
-        y:{ stacked:true, ticks:{ callback: v=>'$'+(v/1e3)+'K' }, grid:{ color:'#f1f5f9' } }
-      }
-    }
-  });
-}
-
-function switchTrend(btn, mode) {
-  btn.closest('.tabs').querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-  btn.classList.add('active');
-  trendMode = mode;
-  trendChart.data = buildTrendDataset(mode);
-  trendChart.options.scales.y.ticks.callback = mode==='premium' ? v=>'$'+(v/1e3)+'K' : v=>v;
-  trendChart.update();
-}
-
 /* ─── Policy Mix Donut ──────────────────────────── */
 function initMixChart(lines) {
-  const labels  = lines.map(l => l.label);
-  const counts  = lines.map(l => l.count);
+  const labels   = lines.map(l => l.label);
+  const counts   = lines.map(l => l.count);
   const bgColors = lines.map((_,i) => colorList[i % colorList.length]);
 
-  mixChart = new Chart(document.getElementById('mixChart').getContext('2d'), {
+  new Chart(document.getElementById('mixChart').getContext('2d'), {
     type: 'doughnut',
     data: { labels, datasets:[{ data:counts, backgroundColor:bgColors, borderWidth:2, borderColor:'#fff', hoverOffset:6 }] },
     options:{
@@ -502,7 +198,6 @@ function initMixChart(lines) {
     }
   });
 
-  // Render legend below donut
   const total = counts.reduce((a,b)=>a+b,0);
   const legend = document.getElementById('mixLegend');
   if (legend) {
@@ -513,75 +208,19 @@ function initMixChart(lines) {
       </div>`).join('');
   }
 
-  // Update policy count in header
   const hdr = document.getElementById('mixPolicyCount');
   if (hdr) hdr.textContent = total + ' policies';
-}
-
-/* ─── Producer Bar Chart ────────────────────────── */
-function initProducerBarChart(producers) {
-  producerBarChart = new Chart(document.getElementById('producerChart').getContext('2d'), {
-    type:'bar',
-    data:{
-      labels: producers.map(p=>p.name.split(' ')[0]),
-      datasets:[{ label:'Premium', data:producers.map(p=>p.premium),
-        backgroundColor: producers.map((_,i)=>colorList[i%colorList.length]),
-        borderRadius:6 }]
-    },
-    options:{
-      responsive:true, maintainAspectRatio:false, indexAxis:'y',
-      plugins:{ legend:{ display:false }, tooltip:{ callbacks:{ label: ctx=>' '+fmt(ctx.parsed.x) } } },
-      scales:{
-        x:{ ticks:{ callback: v=>'$'+(v/1e3)+'K' }, grid:{ color:'#f1f5f9' } },
-        y:{ grid:{ display:false } }
-      }
-    }
-  });
-}
-
-
-/* ─── Producer Table ────────────────────────────── */
-function renderProducerTable(mode) {
-  const sorted = [...allProducers].sort((a,b)=>b[mode]-a[mode]);
-  const max = sorted[0]?.[mode] || 1;
-  document.getElementById('producerBody').innerHTML = sorted.map((p,i)=>{
-    const rankClass = ['rank-1','rank-2','rank-3','rank-n','rank-n','rank-n'][i] || 'rank-n';
-    const pct = Math.round((p[mode]/max)*100);
-    return `
-      <tr>
-        <td><span class="rank-badge ${rankClass}">${i+1}</span></td>
-        <td>
-          <div style="display:flex;align-items:center;gap:8px;">
-            <div style="width:28px;height:28px;border-radius:50%;background:${colorList[i%colorList.length]};display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;">${p.initials}</div>
-            <div>
-              <div style="font-size:13px;font-weight:600;">${p.name}</div>
-              <div class="bar-mini" style="width:80px;"><div class="bar-fill" style="width:${pct}%;background:${colorList[i%colorList.length]};"></div></div>
-            </div>
-          </div>
-        </td>
-        <td class="text-right font-bold">${fmt(p.premium)}</td>
-        <td class="text-right">${p.policies}</td>
-        <td class="text-right"><span class="${p.closeRate>=35?'text-green':p.closeRate<30?'text-red':''} font-bold">${p.closeRate}%</span></td>
-      </tr>`;
-  }).join('');
-}
-
-function switchProducer(btn, mode) {
-  btn.closest('.tabs').querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-  btn.classList.add('active');
-  producerMode = mode;
-  renderProducerTable(mode);
 }
 
 /* ─── Pipeline ──────────────────────────────────── */
 function renderPipeline(p) {
   const stages = [
-    { label:'🔵 New Leads',   key:'new',       color:'#0097b2' },
-    { label:'🟡 Contacted',   key:'contacted',  color:'#f59e0b' },
-    { label:'🟠 Quoted',      key:'quoted',     color:'#e67e22' },
-    { label:'🟢 Proposal',    key:'proposal',   color:'#27ae60' },
-    { label:'✅ Closed Won',  key:'won',        color:'#1a3a5c' },
-    { label:'❌ Lost',        key:'lost',       color:'#e74c3c' },
+    { label:'🔵 New Leads',  key:'new',       color:'#0097b2' },
+    { label:'🟡 Contacted',  key:'contacted',  color:'#f59e0b' },
+    { label:'🟠 Quoted',     key:'quoted',     color:'#e67e22' },
+    { label:'🟢 Proposal',   key:'proposal',   color:'#27ae60' },
+    { label:'✅ Closed Won', key:'won',        color:'#1a3a5c' },
+    { label:'❌ Lost',       key:'lost',       color:'#e74c3c' },
   ];
   const total = p.new || 1;
   const el = document.getElementById('pipelineRows');
@@ -592,29 +231,14 @@ function renderPipeline(p) {
       <div class="pipeline-bar"><div class="pipeline-fill" style="width:${Math.round((p[s.key]??0)/total*100)}%;background:${s.color};"></div></div>
     </div>`).join('');
 
+  const totalEl = document.getElementById('pipelineTotal');
+  if (totalEl) totalEl.textContent = (p.total ?? 0) + ' leads';
+
   const cr = document.getElementById('conversionRate');
   if (cr) cr.textContent = p.conversionRate + '%';
 }
 
-/* ─── Goals ─────────────────────────────────────── */
-function renderGoals(goals) {
-  const goalColors = [colors.teal, colors.green, colors.orange, colors.purple, colors.red];
-  const el = document.getElementById('goalsBody');
-  if (!el || !goals.length) return;
-  el.innerHTML = goals.map((g,i)=>`
-    <div class="goal-card">
-      <div class="goal-header">
-        <span>${g.name}</span>
-        <span class="goal-pct">${g.pct}%</span>
-      </div>
-      <div style="font-size:11px;color:var(--muted);margin-bottom:6px;">
-        ${g.unit==='currency'?fmt(g.achieved):g.achieved} of ${g.unit==='currency'?fmt(g.target):g.target} target
-      </div>
-      <div class="goal-bar"><div class="goal-fill" style="width:${Math.min(g.pct,100)}%;background:${goalColors[i%goalColors.length]};"></div></div>
-    </div>`).join('');
-}
-
-/* ─── Error / Loading states ────────────────────── */
+/* ─── Error state ───────────────────────────────── */
 function showError(msg) {
   const el = document.getElementById('globalError');
   if (el) { el.textContent = '⚠ ' + msg; el.style.display = 'block'; }
@@ -624,20 +248,17 @@ function showError(msg) {
 /* ─── Main loader ───────────────────────────────── */
 async function loadDashboard() {
   try {
-    const res  = await fetch(`${API}/all`);
-    if (!res.ok) throw new Error(`Server returned ${res.status}`);
-    const data = await res.json();
+    const [mixRes, pipelineRes] = await Promise.all([
+      fetch(`${API}/policy-mix`),
+      fetch(`${API}/pipeline`),
+    ]);
+    if (!mixRes.ok)      throw new Error(`Policy mix returned ${mixRes.status}`);
+    if (!pipelineRes.ok) throw new Error(`Pipeline returned ${pipelineRes.status}`);
 
-    trendData    = data.trend;
-    allProducers = data.producers;
+    const [policyMix, pipeline] = await Promise.all([mixRes.json(), pipelineRes.json()]);
 
-    renderKPIs(data.kpis);
-    initTrendChart();
-    initMixChart(data.policyMix);
-    initProducerBarChart(data.producers);
-    renderProducerTable('premium');
-    renderPipeline(data.pipeline);
-    renderGoals(data.goals);
+    initMixChart(policyMix);
+    renderPipeline(pipeline);
   } catch (err) {
     showError('Could not load dashboard data: ' + err.message);
   }
